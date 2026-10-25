@@ -455,7 +455,7 @@ details.data-view>summary::-webkit-details-marker{display:none}
 const CONFIG = {
   app: {
     name: 'Mis Finanzas',
-    version: '1.2.0',
+    version: '1.3.0',
     storageKey: 'misFinanzas.v1',   // clave en localStorage
     schema: 1,                      // versión del formato de datos
   },
@@ -538,6 +538,7 @@ const CONFIG = {
   accountTypes: {
     cash:    { label: 'Efectivo', icon: 'banknote' },     // nombre del ícono SVG (ver IC)
     debit:   { label: 'Débito', icon: 'wallet' },
+    vouchers: { label: 'Vales de despensa', icon: 'ticket' }, // su saldo va aparte del efectivo y débito
     savings: { label: 'Ahorro / inversión', icon: 'piggy' },
     credit:  { label: 'Tarjeta de crédito', icon: 'card' },
   },
@@ -560,6 +561,7 @@ const CONFIG = {
     { name: 'Otros', icon: 'box', color: '#64748B', kind: 'expense' },
     { name: 'Sueldo', icon: 'briefcase', color: '#047857', kind: 'income' },
     { name: 'Extras', icon: 'coins', color: '#15803D', kind: 'income' },
+    { name: 'Vales de despensa', icon: 'ticket', color: '#0E8A8A', kind: 'income' },
     { name: 'Otros ingresos', icon: 'plusCircle', color: '#4D7C0F', kind: 'income' },
   ],
 
@@ -1114,19 +1116,22 @@ function accountBalances(asOf = D.today()) {
     return map;
   });
 }
+/** ¿La cuenta es de vales de despensa? (su saldo va aparte del efectivo y débito) */
+function isVoucher(id) { const a = findAcc(id); return !!a && a.type === 'vouchers'; }
 function totals() {
   return memo('totals', () => {
-    const b = accountBalances(); let liquid = 0, savings = 0, debt = 0, credit = 0;
+    const b = accountBalances(); let liquid = 0, savings = 0, debt = 0, credit = 0, vouchers = 0;
     for (const a of S.accounts) {
       const v = b[a.id] || 0;
       if (a.type === 'credit') { if (v < 0) debt += -v; else credit += v; }
       else if (a.type === 'savings') savings += v;
+      else if (a.type === 'vouchers') vouchers += v;
       else liquid += v;
     }
     const goalsAll = sum(S.goals.filter((g) => !g.archived), goalSaved);
     const goalsLoose = sum(S.goals.filter((g) => !g.archived && !findAcc(g.accountId)), goalSaved);
-    return { liquid: round2(liquid + credit), savings: round2(savings), debt: round2(debt), goalsAll: round2(goalsAll),
-      goalsLoose: round2(goalsLoose), saved: round2(savings + goalsLoose), net: round2(liquid + credit + savings + goalsLoose - debt) };
+    return { liquid: round2(liquid + credit), vouchers: round2(vouchers), hasVouchers: S.accounts.some((a) => a.type === 'vouchers' && !a.archived), savings: round2(savings), debt: round2(debt), goalsAll: round2(goalsAll),
+      goalsLoose: round2(goalsLoose), saved: round2(savings + goalsLoose), net: round2(liquid + credit + vouchers + savings + goalsLoose - debt) };
   });
 }
 
@@ -1183,12 +1188,13 @@ function topCatId(id) { const c = findCat(id); return c ? (c.parentId && findCat
 function periodStats(p) {
   return memo(`ps|${p.start}|${p.end}`, () => {
     const occ = allOccurrences(p.start, p.end).filter((o) => o.status !== 'skipped');
-    const st = { inc: { done: 0, exp: 0 }, out: { done: 0, exp: 0 }, cats: {}, occ };
+    const st = { inc: { done: 0, exp: 0 }, out: { done: 0, exp: 0 }, vin: { done: 0, exp: 0 }, vout: { done: 0, exp: 0 }, cats: {}, occ };
     for (const o of occ) {
       if (o.kind !== 'income' && o.kind !== 'expense') continue;
       const side = o.kind === 'income' ? st.inc : st.out;
       const k = o.status === 'done' ? 'done' : 'exp';
       side[k] += o.amount;
+      if (isVoucher(o.accountId)) (o.kind === 'income' ? st.vin : st.vout)[k] += o.amount;
       if (o.kind === 'expense') {
         for (const cid of new Set([o.categoryId || '_none', topCatId(o.categoryId) || '_none'])) {
           st.cats[cid] = st.cats[cid] || { done: 0, exp: 0 };
@@ -1341,11 +1347,13 @@ function goalItems(goals = activeGoals()) {
 }
 /** Ahorro del periodo según la regla del usuario */
 function savingsPlan(p, rule = S.settings.savings) {
+  // los vales de despensa no se pueden ahorrar: no entran en la regla de ahorro
   const st = periodStats(p);
-  const incAll = st.inc.done + st.inc.exp, outAll = st.out.done + st.out.exp;
+  const incDone = st.inc.done - st.vin.done, outDone = st.out.done - st.vout.done;
+  const incAll = incDone + st.inc.exp - st.vin.exp, outAll = outDone + st.out.exp - st.vout.exp;
   if (rule.type === 'fixed') return { target: round2(+rule.fixed || 0), soFar: round2(+rule.fixed || 0), text: `${money(rule.fixed)} por periodo` };
-  if (rule.type === 'percent') return { target: round2(incAll * rule.percent / 100), soFar: round2(st.inc.done * rule.percent / 100), text: `${rule.percent}% de cada ingreso` };
-  return { target: round2(Math.max(0, incAll - outAll)), soFar: round2(Math.max(0, st.inc.done - st.out.done)), text: 'Lo que sobre al final del periodo' };
+  if (rule.type === 'percent') return { target: round2(incAll * rule.percent / 100), soFar: round2(incDone * rule.percent / 100), text: `${rule.percent}% de cada ingreso` };
+  return { target: round2(Math.max(0, incAll - outAll)), soFar: round2(Math.max(0, incDone - outDone)), text: 'Lo que sobre al final del periodo' };
 }
 function contributedIn(p) {
   let s = 0;
@@ -1390,7 +1398,7 @@ function savingsEvents(sv, end, ev) {
   const curDone = contributedIn(cur);
   if (sv.type === 'percent') {
     const st = periodStats(cur);
-    const pend = round2(Math.max(0, st.inc.done * sv.percent / 100 - curDone));
+    const pend = round2(Math.max(0, (st.inc.done - st.vin.done) * sv.percent / 100 - curDone));
     if (pend > 0) out.push({ d: cur.end < end ? cur.end : end, save: pend });
     for (const e of ev) if (e.inc) out.push({ d: e.d, save: round2(e.inc * sv.percent / 100) });
   } else {
@@ -1400,7 +1408,7 @@ function savingsEvents(sv, end, ev) {
       else {
         const inP = ev.filter((e) => e.d >= p.start && e.d <= p.end);
         a = sum(inP, (e) => e.inc || 0) - sum(inP, (e) => e.exp || 0);
-        if (k === 0) { const st = periodStats(cur); a += st.inc.done - st.out.done; }
+        if (k === 0) { const st = periodStats(cur); a += (st.inc.done - st.vin.done) - (st.out.done - st.vout.done); }
       }
       if (k === 0) a -= curDone;
       if (a > 0.004) out.push({ d: p.end, save: round2(a) });
@@ -1435,6 +1443,7 @@ function projection(opt = {}) {
   const ev = [];
   const occs = allOccurrences(D.add(t, -90), end, rules === S.rules ? null : rules).filter((o) => o.status === 'scheduled' || o.status === 'pending');
   for (const o of occs) {
+    if (isVoucher(o.accountId) && o.kind !== 'transfer') continue;   // los vales van aparte
     const d = o.date < t ? t : o.date; const a = amt(o);
     if (o.kind === 'income') ev.push({ d, flow: a, inc: a });
     else if (o.kind === 'expense') ev.push({ d, flow: -a, exp: a });
@@ -1514,7 +1523,7 @@ function simulateTo(end, opt = {}) {
   const run = () => {
     const bal0 = accountBalances(); const bal = {};
     for (const a of S.accounts) bal[a.id] = bal0[a.id] || 0;
-    const isLiquid = (a) => a && a.type !== 'credit' && a.type !== 'savings';
+    const isLiquid = (a) => a && a.type !== 'credit' && a.type !== 'savings' && a.type !== 'vouchers';
     const liquidIds = S.accounts.filter(isLiquid).map((a) => a.id);
     // cuenta principal (de aquí salen pagos de tarjeta y ahorro): la de débito con más saldo hoy
     const mainId = S.accounts.filter((a) => isLiquid(a) && !a.archived).sort((x, y) => (x.type === 'debit' ? 0 : 1) - (y.type === 'debit' ? 0 : 1) || (bal0[y.id] || 0) - (bal0[x.id] || 0)).map((a) => a.id)[0] || null;
@@ -1525,6 +1534,7 @@ function simulateTo(end, opt = {}) {
     const liquidNow = () => round2(sum(liquidIds, (id) => bal[id] || 0));
     const netNow = () => round2(sum(S.accounts, (a) => bal[a.id] || 0) + sum(goals.filter((g) => !g.accountId), (g) => g.value));
     const savedNow = () => round2(sum(S.accounts.filter((a) => a.type === 'savings'), (a) => bal[a.id] || 0) + sum(goals.filter((g) => !g.accountId), (g) => g.value));
+    const vouchersNow = () => round2(sum(S.accounts.filter((a) => a.type === 'vouchers'), (a) => bal[a.id] || 0));
     const debtNow = () => round2(sum(S.accounts.filter((a) => a.type === 'credit'), (a) => Math.max(0, -(bal[a.id] || 0))));
 
     // eventos
@@ -1535,7 +1545,7 @@ function simulateTo(end, opt = {}) {
       ev.push({ d: o.date < t ? t : o.date, kind: o.kind, amt: o.hasAmount ? o.amount : baseAmount(o.rule, vmode), from: o.accountId, to: o.toAccountId, name: o.name, cat: o.categoryId });
     }
     for (const x of extras) if (x.date >= t && x.date <= end && +x.amount > 0) ev.push({ d: x.date, kind: x.kind, amt: +x.amount, from: x.accountId, name: x.name || (x.kind === 'income' ? 'Ingreso extra' : 'Gasto extra'), extra: true });
-    if (applySavings) for (const s of savingsEvents(sv, end, ev.map((e) => ({ d: e.d, inc: e.kind === 'income' ? e.amt : 0, exp: e.kind === 'expense' ? e.amt : 0 })))) ev.push({ d: s.d, kind: 'save', amt: s.save });
+    if (applySavings) for (const s of savingsEvents(sv, end, ev.filter((e) => !isVoucher(e.from)).map((e) => ({ d: e.d, inc: e.kind === 'income' ? e.amt : 0, exp: e.kind === 'expense' ? e.amt : 0 })))) ev.push({ d: s.d, kind: 'save', amt: s.save });
     if (payCards) for (const a of S.accounts.filter((x) => x.type === 'credit' && !x.archived)) {
       const c = cardInfo(a);
       if (c.pendingLast > 0) ev.push({ d: D.max(c.dueLast, t), kind: 'cardpay', card: a.id, fixed: c.pendingLast });
@@ -1604,6 +1614,7 @@ function simulateTo(end, opt = {}) {
       end, points, accounts, goals, low, firstNeg,
       liquid0: p0.liquid, liquid1: p1.liquid, net0: p0.net, net1: p1.net, saved0: p0.saved, saved1: p1.saved,
       debt0: round2(sum(S.accounts.filter((a) => a.type === 'credit'), (a) => Math.max(0, -(bal0[a.id] || 0)))), debt1: debtNow(),
+      vouchers0: round2(sum(S.accounts.filter((a) => a.type === 'vouchers'), (a) => bal0[a.id] || 0)), vouchers1: vouchersNow(), hasVouchers: S.accounts.some((a) => a.type === 'vouchers' && !a.archived),
       inc: round2(R.inc), exp: round2(R.exp), saved: round2(R.saved), interest: round2(R.interest), cardPaid: round2(R.cardPaid),
       extraIn: round2(R.extraIn), extraOut: round2(R.extraOut),
       topExpenses: Object.values(R.byName).sort((a, b) => b.total - a.total).slice(0, 6),
@@ -1962,7 +1973,7 @@ function moneyInput(name, value, { big = false, placeholder = '0', attrs = '' } 
 }
 function opt(v, label, sel) { return `<option value="${esc(v)}" ${String(v) === String(sel) ? 'selected' : ''}>${esc(label)}</option>`; }
 function accLabel(a) { return a.name + (a.type === 'credit' ? ' (tarjeta)' : ''); }
-function accIcon(a) { return IC[(CONFIG.accountTypes[(a || {}).type] || {}).icon] || IC.wallet; }
+function accIcon(a) { return ico((CONFIG.accountTypes[(a || {}).type] || {}).icon || 'wallet'); }
 function accountOptions(sel, { none = false, noneLabel = 'Ninguna', filter } = {}) {
   let list = activeAccounts(); if (filter) list = list.filter(filter);
   return (none ? opt('', noneLabel, sel || '') : '') + list.map((a) => opt(a.id, accLabel(a), sel)).join('');
@@ -2374,7 +2385,7 @@ const HOME = {
     if (!S.accounts.length) return `<section class="hero"><div class="hero-label">Saldo disponible</div><div class="hero-amount">${money(0)}</div><button type="button" class="hero-link" data-act="newAccount">Agregar una cuenta</button></section>`;
     const np = nextPayday(); const until = np ? D.add(np, -1) : p.end;
     const sched = until > t ? allOccurrences(D.add(t, 1), until).filter((o) => o.status === 'scheduled' || o.status === 'pending') : [];
-    const outs = sum(sched.filter((o) => o.kind === 'expense' && (findAcc(o.accountId) || {}).type !== 'credit'), (o) => o.amount);
+    const outs = sum(sched.filter((o) => o.kind === 'expense' && !['credit', 'vouchers'].includes((findAcc(o.accountId) || {}).type)), (o) => o.amount);
     const dues = sum(cardDues(t, until), (c) => c.amount);
     const svLeft = Math.max(0, savingsPlan(p).target - contributedIn(p));
     const free = round2(tt.liquid - outs - dues - svLeft);
@@ -2392,6 +2403,7 @@ const HOME = {
       <div class="track" aria-hidden="true"><span class="track-line"></span><span class="track-fill" style="width:${nowP}%"></span>${ticks}<span class="track-now" style="left:${nowP}%"></span></div>
       <div class="track-ends"><span>${fmtDate(p.start)}</span><span>${endTxt}</span></div>
       <div class="hero-foot"><span>Libre tras pagos y ahorro${np ? ' hasta tu cobro' : ''}</span><b>${money(free)}</b></div>
+      ${tt.hasVouchers ? `<div class="hero-foot" style="border:0;padding-top:0;margin-top:.375rem"><span>Vales de despensa (aparte)</span><b>${money(tt.vouchers)}</b></div>` : ''}
       ${tt.debt > 0 ? `<div class="hero-foot" style="border:0;padding-top:0;margin-top:.375rem"><span>Deuda en tarjetas</span><b>${money(tt.debt)}</b></div>` : ''}
     </section>`;
   },
@@ -2586,7 +2598,7 @@ function budgetRow(c, p, sub) {
 }
 function movesAccounts() {
   const tt = totals(); const b = accountBalances();
-  let h = `<div class="panel"><div class="duo"><div class="stat"><small>Disponible</small><b>${money(tt.liquid)}</b></div><div class="stat"><small>Ahorro e inversión</small><b>${money(tt.savings)}</b></div><div class="stat"><small>Deuda en tarjetas</small><b class="${tt.debt ? 'out' : ''}">${money(tt.debt)}</b></div><div class="stat"><small>Patrimonio neto</small><b>${money(tt.net)}</b></div></div></div>`;
+  let h = `<div class="panel"><div class="duo"><div class="stat"><small>Disponible</small><b>${money(tt.liquid)}</b></div>${tt.hasVouchers ? `<div class="stat"><small>Vales de despensa</small><b>${money(tt.vouchers)}</b></div>` : ''}<div class="stat"><small>Ahorro e inversión</small><b>${money(tt.savings)}</b></div><div class="stat"><small>Deuda en tarjetas</small><b class="${tt.debt ? 'out' : ''}">${money(tt.debt)}</b></div><div class="stat"><small>Patrimonio neto</small><b>${money(tt.net)}</b></div></div></div>`;
   if (!S.accounts.length) h += emptyBox('bank', 'Agrega tus cuentas: efectivo, débito, ahorro o tarjetas de crédito.');
   for (const [type, meta] of Object.entries(CONFIG.accountTypes)) {
     const list = S.accounts.filter((a) => a.type === type && !a.archived); if (!list.length) continue;
@@ -2828,6 +2840,7 @@ function projDate() {
       <div class="stat"><small>Disponible</small><b>${esc(money(r.liquid1, { decimals: 0 }))}</b>${delta(r.liquid1 - r.liquid0)}</div>
       <div class="stat"><small>Ahorro y metas</small><b>${esc(money(r.saved1, { decimals: 0 }))}</b>${delta(r.saved1 - r.saved0)}</div>
     </div>
+    ${r.hasVouchers ? `<div class="kv mt-s"><span>Vales de despensa</span><span>${esc(money(r.vouchers1, { decimals: 0 }))}</span></div>` : ''}
     ${r.debt0 || r.debt1 ? `<div class="kv mt-s"><span>Deuda en tarjetas</span><span>${esc(money(r.debt1, { decimals: 0 }))}</span></div>` : ''}
     ${lineChart('ch-sd', [
     { name: 'Patrimonio', color: 'var(--c-3)', points: r.points.map((x) => ({ date: x.date, y: x.net })) },
@@ -2931,6 +2944,9 @@ function defaultAccountId(kind) {
 }
 function firstCatId(kind) { const c = S.categories.find((x) => x.kind === kind && !x.parentId); return c ? c.id : null; }
 
+/** Con vales de despensa, cada gasto pregunta con qué se pagó (no se elige uno por defecto) */
+function askPayment(kind) { return kind === 'expense' && activeAccounts().some((a) => a.type === 'vouchers'); }
+
 /* ---------- Movimiento: crear y editar ----------
  * scope: 'new' | 'dup' | 'all' (toda la regla) | 'future' (esta y siguientes) | 'one' (solo esta vez) */
 function openMoveForm({ rule = null, scope = 'new', occ = null, kind = 'expense', recurring = false, date = null, lockKind = false, preset = null, onSaved = null } = {}) {
@@ -2938,7 +2954,7 @@ function openMoveForm({ rule = null, scope = 'new', occ = null, kind = 'expense'
   const d = {
     kind: src.kind || kind, name: src.name || '', amount: src.amount != null ? src.amount : null, variable: !!src.variable,
     min: src.min != null ? src.min : null, max: src.max != null ? src.max : null,
-    accountId: src.accountId || defaultAccountId(src.kind || kind), toAccountId: src.toAccountId || null,
+    accountId: src.accountId || (askPayment(src.kind || kind) ? null : defaultAccountId(src.kind || kind)), toAccountId: src.toAccountId || null,
     categoryId: src.categoryId !== undefined ? src.categoryId : null, notes: src.notes || '',
     remindDays: src.remindDays != null ? src.remindDays : '',
     freq: src.freq ? normFreq(clone(src.freq)) : normFreq({ type: recurring ? 'monthly' : 'once', start: date || D.today() }),
@@ -2978,7 +2994,7 @@ function openMoveForm({ rule = null, scope = 'new', occ = null, kind = 'expense'
       else h += switchHTML('Ingreso variable', { name: 'variableInc', checked: d.variable, sub: 'Cambia cada vez; indica un mínimo y un máximo' });
     }
     if (isT) h += `<div class="grid2"><label class="field"><span>Desde</span><select class="input" name="accountId">${accountOptions(d.accountId)}</select></label><label class="field"><span>Hacia</span><select class="input" name="toAccountId">${accountOptions(d.toAccountId)}</select></label></div>`;
-    else h += `<label class="field"><span>Cuenta</span><select class="input" name="accountId">${accountOptions(d.accountId, { none: !activeAccounts().length || !d.accountId, noneLabel: 'Sin cuenta' })}</select></label>`;
+    else h += `<label class="field"><span>${k === 'expense' ? '¿Con qué pagaste?' : k === 'income' ? '¿A dónde llega?' : 'Cuenta'}</span><select class="input" name="accountId">${accountOptions(d.accountId, { none: !activeAccounts().length || !d.accountId, noneLabel: activeAccounts().length ? (k === 'expense' ? 'Elige con qué pagaste' : 'Elige una cuenta') : 'Sin cuenta' })}</select></label>`;
     if (!isT) h += `<div class="field"><span>Categoría</span><div data-catbox>${catChips(k, d.categoryId)}</div></div>`;
     if (one) h += `<label class="field"><span>Fecha de esta vez</span><input class="input" type="date" name="date" value="${esc(d.date)}"></label>`;
     else h += `<div data-freq></div>`;
@@ -3017,7 +3033,7 @@ function openMoveForm({ rule = null, scope = 'new', occ = null, kind = 'expense'
     if (d.kind === 'transfer') {
       if (!d.accountId || !d.toAccountId) return toast('Elige las dos cuentas de la transferencia.', 'error');
       if (d.accountId === d.toAccountId) return toast('La cuenta de origen y la de destino deben ser distintas.', 'error');
-    } else if (activeAccounts().length && !d.accountId) return toast('Elige una cuenta.', 'error');
+    } else if (activeAccounts().length && !d.accountId) return toast(d.kind === 'expense' ? 'Elige con qué pagaste: efectivo, débito, vales…' : 'Elige una cuenta.', 'error');
     if (one && !D.valid(d.date)) return toast('Elige una fecha.', 'error');
     if (!d.name) d.name = d.kind === 'transfer' ? `Transferencia a ${accName(d.toAccountId)}` : d.categoryId ? catName(d.categoryId, false) : KIND_LABEL[d.kind];
     const data = { kind: d.kind, name: d.name, amount: d.amount, variable: d.kind !== 'transfer' && d.variable, min: d.kind === 'income' && d.variable ? d.min : null, max: d.kind === 'income' && d.variable ? d.max : null,
@@ -3203,7 +3219,7 @@ function quickCatChips(order, selected) {
 }
 function openQuickAdd() {
   if (!S.setupDone) return startWizard();
-  const d = { categoryId: S.settings.quick.lastCategoryId && findCat(S.settings.quick.lastCategoryId) ? S.settings.quick.lastCategoryId : firstCatId('expense'), accountId: defaultAccountId('expense'), date: D.today() };
+  const d = { categoryId: S.settings.quick.lastCategoryId && findCat(S.settings.quick.lastCategoryId) ? S.settings.quick.lastCategoryId : firstCatId('expense'), accountId: askPayment('expense') ? null : defaultAccountId('expense'), date: D.today() };
   const accs = activeAccounts().filter((a) => a.type !== 'savings');
   const order = quickCatOrder(); let allCats = false;
   const catsHTML = () => (allCats ? catChips('expense', d.categoryId) : quickCatChips(order, d.categoryId));
@@ -3211,7 +3227,7 @@ function openQuickAdd() {
   const dayChips = () => `<div class="chips">${[[D.today(), 'Hoy'], [D.add(D.today(), -1), 'Ayer']].map(([v, l]) => `<button type="button" class="chip sm" data-day="${v}" aria-pressed="${d.date === v}">${l}</button>`).join('')}<input class="input" type="date" name="qdate" value="${d.date}" style="width:auto;flex:1;min-height:36px;padding:.25rem .625rem" aria-label="Otra fecha"></div>`;
   const body = `<div class="field">${moneyInput('amount', null, { big: true })}</div>
     <div class="field"><span>Categoría</span><div data-catbox>${catsHTML()}</div></div>
-    <div class="field"><span>Cuenta</span><div data-accbox>${accChips()}</div></div>
+    <div class="field"><span>${askPayment('expense') ? '¿Con qué pagaste?' : 'Cuenta'}</span><div data-accbox>${accChips()}</div></div>
     <div class="field"><span>Fecha</span><div data-daybox>${dayChips()}</div></div>
     <label class="field"><span>Descripción (opcional)</span><input class="input" name="name" placeholder="Si la dejas vacía se usa la categoría" autocomplete="off"></label>`;
   const sh = openSheet({ title: 'Gasto rápido', body, foot: `<button type="button" class="btn ghost" data-more>Más opciones</button><button type="button" class="btn" data-save>Guardar gasto</button>` });
@@ -3231,6 +3247,7 @@ function openQuickAdd() {
   };
   const doSave = () => {
     const v = collect(); if (!(v.amount > 0)) return toast('Escribe el monto del gasto.', 'error');
+    if (accs.length && !d.accountId) { toast('Elige con qué pagaste: efectivo, débito, vales…', 'error'); const box = $('[data-accbox]', sh.body); if (box) box.scrollIntoView({ block: 'center', behavior: 'smooth' }); return; }
     const r = { id: uid(), kind: 'expense', name: v.name || catName(d.categoryId, false) || 'Gasto', amount: v.amount, variable: false, min: null, max: null, accountId: d.accountId, toAccountId: null, categoryId: d.categoryId, notes: '', remindDays: '', freq: normFreq({ type: 'once', start: d.date }), exc: {}, pauses: [], created: D.today() };
     S.rules.push(r); S.settings.quick.lastCategoryId = d.categoryId; S.settings.quick.lastAccountId = d.accountId;
     save(); sh.close(); render();
@@ -3256,7 +3273,7 @@ function openAccountForm(acc = null, { onSaved, type = 'debit' } = {}) {
         <p class="muted small" style="margin-top:-.25rem">Si el día límite es menor o igual al de corte, se toma el del mes siguiente.</p>
         <label class="field"><span>Te falta pagar del último corte <span class="hint">opcional</span></span>${moneyInput('stmt', acc && acc.stmtCut === cardInfo(acc).lastCut ? acc.stmtAmount : '', { placeholder: 'Si lo dejas vacío se usa la deuda' })}<span class="hint">El "pago para no generar intereses" que aún no cubres.</span></label>`
     : `<div class="field"><span>Saldo actual</span>${moneyInput('balance', acc ? bal : d.balance || '', { big: true })}${acc ? '<span class="hint">Si lo cambias se registra un ajuste de saldo con fecha de hoy.</span>' : ''}</div>
-        <label class="field"><span>Rendimiento anual (%) <span class="hint">opcional, ej. CETES</span></span><input class="input" name="rate" inputmode="decimal" value="${esc(d.rate)}" placeholder="0"></label>`}
+        ${d.type === 'vouchers' ? '<p class="muted small" style="margin-top:-.25rem">El saldo de vales se muestra aparte y no se suma a tu efectivo y débito. Registra tus vales como un ingreso que llega a esta cuenta.</p>' : `<label class="field"><span>Rendimiento anual (%) <span class="hint">opcional, ej. CETES</span></span><input class="input" name="rate" inputmode="decimal" value="${esc(d.rate)}" placeholder="0"></label>`}`}
       <div class="field"><span>Color</span>${swatches(d.color)}</div>
       ${acc ? switchHTML('Archivar cuenta', { name: 'archived', checked: !!d.archived, sub: 'Deja de aparecer en listas y totales' }) : ''}`);
   }
@@ -3280,6 +3297,7 @@ function openAccountForm(acc = null, { onSaved, type = 'debit' } = {}) {
     }
     let a = acc;
     if (!acc) { a = Object.assign({ id: uid(), initial: signed, balanceDate: D.today() }, fields); S.accounts.push(a); }
+    if (type === 'vouchers') ensureVoucherCategory();
     else {
       Object.assign(acc, fields);
       const diff = round2(signed - bal);
@@ -3296,6 +3314,11 @@ function openAccountForm(acc = null, { onSaved, type = 'debit' } = {}) {
     }
     if (await confirmDlg(`Se eliminará la cuenta "${esc(acc.name)}".`, { title: 'Eliminar cuenta', ok: 'Eliminar', danger: true })) { S.accounts = S.accounts.filter((x) => x.id !== acc.id); save(); closeAllSheets(); render(); }
   };
+}
+/** Al usar vales, crea la categoría de ingreso "Vales de despensa" si no existe */
+function ensureVoucherCategory() {
+  if (S.categories.some((c) => c.kind === 'income' && /vale/i.test(c.name))) return;
+  S.categories.push({ id: uid(), name: 'Vales de despensa', icon: 'ticket', color: '#0E8A8A', kind: 'income', parentId: null, budget: null, alert: null });
 }
 function openAccountSheet(id) {
   const a = findAcc(id); if (!a) return; const cr = a.type === 'credit';
@@ -3698,7 +3721,9 @@ function loadSample() {
   const deb = acc({ name: 'Nómina', type: 'debit', initial: 18400, color: '#2B50D6' });
   const sav = acc({ name: 'CETES', type: 'savings', initial: 42000, rate: 7, color: '#0E8A8A' });
   const tdc = acc({ name: 'Tarjeta Oro', type: 'credit', initial: -6350, limit: 35000, cutDay: 5, dueDay: 25, color: '#B4461C', stmtAmount: 3870, stmtCut: lastCutFor(5) });
-  S.accounts.push(cash, deb, sav, tdc);
+  const vales = acc({ name: 'Vales de despensa', type: 'vouchers', initial: 900, color: '#0E8A8A' });
+  S.accounts.push(cash, deb, vales, sav, tdc);
+  ensureVoucherCategory();
   const s0 = D.add(t, -120);
   const sueldo = mk({ kind: 'income', name: 'Sueldo', amount: 16500, accountId: deb.id, categoryId: catBy('Sueldo'), freq: { type: 'semimonthly', semiMode: '15-last', start: s0, adjust: 'before' } });
   S.rules.push(sueldo,
@@ -3711,6 +3736,8 @@ function loadSample() {
     mk({ kind: 'expense', name: 'Gasolina', amount: 900, accountId: tdc.id, categoryId: catBy('Gasolina'), freq: { type: 'days', interval: 14, start: D.add(t, -9) } }),
     mk({ kind: 'expense', name: 'Celular a 12 MSI', amount: 1249, accountId: tdc.id, categoryId: catBy('Deudas'), freq: { type: 'monthly', monthMode: 'day', day: 5, start: D.addMonths(t, -2), endType: 'count', count: 12 } }),
     mk({ kind: 'expense', name: 'Seguro del auto', amount: 7800, accountId: deb.id, categoryId: catBy('Transporte'), freq: { type: 'yearly', month: D.p(D.addMonths(t, 3)).m, day: 15, start: s0 } }),
+    mk({ kind: 'income', name: 'Vales de despensa', amount: 1600, accountId: vales.id, categoryId: (S.categories.find((c) => c.kind === 'income' && /vale/i.test(c.name)) || {}).id || null, freq: { type: 'monthly', monthMode: 'last', start: s0 } }),
+    mk({ kind: 'expense', name: 'Súper con vales', amount: 700, accountId: vales.id, categoryId: catBy('Súper'), created: t, freq: { type: 'once', start: D.add(t, -4) } }),
     mk({ kind: 'expense', name: 'Tacos', amount: 240, accountId: cash.id, categoryId: catBy('Restaurantes'), created: t, freq: { type: 'once', start: D.add(t, -2) } }),
     mk({ kind: 'expense', name: 'Farmacia', amount: 385, accountId: deb.id, categoryId: catBy('Salud'), created: t, freq: { type: 'once', start: D.add(t, -5) } }),
     mk({ kind: 'expense', name: 'Cine', amount: 320, accountId: tdc.id, categoryId: catBy('Entretenimiento'), created: t, freq: { type: 'once', start: D.add(t, -3) } }),
@@ -3874,7 +3901,7 @@ function drawWizard() {
       <div class="preview"><b>Así se verá:</b> ${esc(money(12345.5))}, ${esc(fmtDate(D.today(), 'full'))}</div>`;
   }
   if (s === 2) {
-    body = `<h1>Tus cuentas</h1><p class="lead">¿Dónde tienes tu dinero hoy? Escribe el saldo actual de cada una.</p>` +
+    body = `<h1>Tus cuentas</h1><p class="lead">¿Dónde tienes tu dinero hoy? Escribe el saldo actual de cada una. Si recibes vales de despensa, agrega una cuenta de tipo "Vales de despensa": su saldo se lleva aparte.</p>` +
       W.accounts.map((a, i) => {
         const cr = a.type === 'credit';
         return `<div class="wz-card" data-i="${i}"><div class="row"><select class="input" data-wa="type" style="flex:1">${Object.entries(CONFIG.accountTypes).map(([k, v]) => opt(k, v.label, a.type)).join('')}</select><button type="button" class="icon-btn" data-w="delacc" data-i="${i}" aria-label="Quitar cuenta">${IC.trash}</button></div>
@@ -3934,6 +3961,7 @@ function wzReadAccounts() {
 function wzCommitAccounts() {
   wzReadAccounts(); const t = D.today();
   const keep = W.accounts.filter((a) => String(a.name || '').trim());
+  if (keep.some((a) => a.type === 'vouchers')) ensureVoucherCategory();
   for (const a of keep) {
     const signed = a.type === 'credit' ? -Math.abs(+a.initial || 0) : +a.initial || 0;
     const ex = findAcc(a.id);

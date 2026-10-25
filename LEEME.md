@@ -91,7 +91,7 @@ En iPhone, las notificaciones solo funcionan con la app agregada a inicio y iOS 
 ## Actualizar la app más adelante
 
 1. Sube el `index.html` nuevo a GitHub (**Add file → Upload files**, reemplaza el anterior).
-2. En `sw.js` cambia la línea `const VERSION = 'v1.2.0';` por otra versión, por ejemplo `'v1.2.1'`, y súbelo también.
+2. En `sw.js` cambia la línea `const VERSION = 'v1.3.0';` por otra versión, por ejemplo `'v1.3.1'`, y súbelo también.
 3. Al abrir la app aparecerá "Hay una versión nueva" con el botón **Actualizar**. Tus datos no se tocan.
 
 ---
