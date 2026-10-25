@@ -91,7 +91,7 @@ En iPhone, las notificaciones solo funcionan con la app agregada a inicio y iOS 
 ## Actualizar la app más adelante
 
 1. Sube el `index.html` nuevo a GitHub (**Add file → Upload files**, reemplaza el anterior).
-2. En `sw.js` cambia la línea `const VERSION = 'v1.3.0';` por otra versión, por ejemplo `'v1.3.1'`, y súbelo también.
+2. En `sw.js` cambia la línea `const VERSION = 'v1.4.0';` por otra versión, por ejemplo `'v1.4.1'`, y súbelo también.
 3. Al abrir la app aparecerá "Hay una versión nueva" con el botón **Actualizar**. Tus datos no se tocan.
 
 ---
@@ -103,6 +103,8 @@ Toda la configuración por defecto está en un solo objeto, `CONFIG`, al inicio 
 - `CONFIG.defaults`: valores iniciales de Ajustes (moneda, formato de fecha, periodo, regla de ahorro, fines de semana, recordatorios, tema, color principal, tarjetas de Inicio, proyección…).
 - `CONFIG.categories`: categorías y subcategorías iniciales con su ícono y color.
 - `CONFIG.currencies`, `CONFIG.palette`, `CONFIG.primaryColors`, `CONFIG.icons`: listas para los selectores (los íconos están dibujados en el objeto `GLYPHS`).
+- `CONFIG.debtPlans`: nombres de las formas de pagar una deuda en el simulador (próximo cobro, dividir entre cobros, fecha límite, no pagar).
+- `CONFIG.tips`: umbrales de las recomendaciones (porcentaje de ahorro, gastos fijos, meses de fondo de emergencia, uso de tarjetas, monto de "gastos hormiga").
 - `CONFIG.limits`: límites de seguridad (horizonte máximo de la proyección, fechas en la vista previa).
 
 Cambiar `CONFIG.defaults` afecta solo a instalaciones nuevas o a opciones que el usuario nunca ha modificado; lo que cada persona cambia en Ajustes tiene prioridad.

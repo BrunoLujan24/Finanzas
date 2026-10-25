@@ -230,6 +230,10 @@ textarea.input{min-height:84px;resize:vertical}
 .seg.scroll{overflow-x:auto;scrollbar-width:none}
 .seg.scroll::-webkit-scrollbar{display:none}
 .seg.scroll button{flex:1 0 auto;padding:0 .5rem;font-size:.875rem}
+.seg.tight{overflow-x:auto;scrollbar-width:none}
+.seg.tight::-webkit-scrollbar{display:none}
+.seg.tight button{flex:1 0 auto;padding:0 .5rem;font-size:.875rem}
+@media (max-width:360px){.seg.tight button{padding:0 .375rem;font-size:.8125rem}}
 .chips{display:flex;flex-wrap:wrap;gap:.5rem}
 .chips.scroll{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:0 -1rem;padding:0 1rem .25rem}
 .chips.scroll::-webkit-scrollbar{display:none}
@@ -367,6 +371,43 @@ details.data-view>summary::-webkit-details-marker{display:none}
 .legend i.box{width:12px;height:12px;border-radius:3px}
 .legend i.dash{background:repeating-linear-gradient(90deg,currentColor 0 4px,transparent 4px 7px)!important}
 .legend i.faded{opacity:.45}
+#sd-debts{scroll-margin-top:84px}
+.debt-item{padding:.75rem 0;border-top:1px solid var(--line)}
+.debt-item.dim{opacity:.6}
+.debt-head{display:flex;align-items:center;gap:.75rem;min-height:44px}
+.debt-head .item-main{flex:1;min-width:0;display:flex;flex-direction:column;text-align:left}
+.debt-head .item-sub{white-space:normal}
+.debt-edit{background:none;border:0;padding:0;color:inherit;font:inherit;min-height:44px;justify-content:center;cursor:pointer}
+.plan-chips{margin:.5rem 0 .25rem}
+.debt-cycle{margin-top:.5rem;padding:.5rem .75rem;border-radius:var(--r-sm);background:var(--surface-2)}
+.debt-cycle .kv{padding:0}
+.plan-note{margin:.5rem 0 0;font-size:.875rem;color:var(--muted)}
+.pay-pills{display:flex;flex-wrap:wrap;gap:.375rem;margin-top:.375rem}
+.pay-pill{display:inline-flex;align-items:baseline;gap:.375rem;padding:.3125rem .5rem;border-radius:8px;border:1px solid var(--line);background:var(--surface);font-size:.8125rem}
+.pay-pill span{color:var(--muted)}
+.pay-pill b{font-family:var(--font-num);font-weight:600}
+.debt-cycle .pay-pill{background:var(--surface)}
+table.data.cmp th{white-space:normal;vertical-align:bottom;line-height:1.2}
+table.data.cmp tr.low td{font-weight:600;border-bottom:0}
+table.data.cmp tr.low td:first-child{font-family:inherit}
+table.data.cmp td:first-child{font-family:inherit}
+.tip{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--tc,var(--primary));border-radius:var(--r-md);padding:.875rem 1rem;margin-bottom:.75rem}
+.tip.bad{--tc:var(--st-bad)}.tip.warn{--tc:var(--st-warn)}.tip.info{--tc:var(--primary)}.tip.good{--tc:var(--st-good)}
+.tip-top{display:flex;align-items:flex-start;gap:.75rem}
+.tip-top h3{flex:1;min-width:0;padding-top:.3125rem}
+.tip-ico{display:inline-grid;place-items:center;width:32px;height:32px;border-radius:10px;background:color-mix(in srgb,var(--tc,var(--primary)) 14%,var(--surface));color:color-mix(in srgb,var(--tc,var(--primary)) 80%,var(--ink));flex:none}
+.tip-ico svg{width:18px;height:18px}
+.tip h3{margin:0;font-size:1rem;font-weight:600;line-height:1.35}
+.tip p{margin:.5rem 0 0;font-size:.9375rem;line-height:1.5;color:var(--ink)}
+.tip-actions{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.75rem}
+.tips-group{font-size:.8125rem;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:1.25rem .25rem .5rem}
+.tip-counts{display:flex;flex-wrap:wrap;gap:.5rem}
+.tip-count{display:inline-flex;align-items:baseline;gap:.25rem;padding:.25rem .625rem;border-radius:8px;font-size:.8125rem;background:color-mix(in srgb,var(--tc) 12%,var(--surface));color:color-mix(in srgb,var(--tc) 80%,var(--ink))}
+.tip-count b{font-family:var(--font-num)}
+.tip-count.bad{--tc:var(--st-bad)}.tip-count.warn{--tc:var(--st-warn)}.tip-count.info{--tc:var(--primary)}.tip-count.good{--tc:var(--st-good)}
+.tip-row .item-title{white-space:normal;line-height:1.3}
+.tip-row .tip-ico.bad{--tc:var(--st-bad)}.tip-row .tip-ico.warn{--tc:var(--st-warn)}.tip-row .tip-ico.info{--tc:var(--primary)}
+.tip-row .chev{width:20px;color:var(--muted);flex:none}
 .insight{display:flex;gap:.625rem;align-items:flex-start;padding:.625rem .75rem;border-radius:var(--r-sm);background:var(--surface-2);font-size:.875rem;margin-top:.5rem}
 .insight svg{width:18px;height:18px;margin-top:2px;color:var(--primary-text)}
 
@@ -455,7 +496,7 @@ details.data-view>summary::-webkit-details-marker{display:none}
 const CONFIG = {
   app: {
     name: 'Mis Finanzas',
-    version: '1.3.0',
+    version: '1.4.0',
     storageKey: 'misFinanzas.v1',   // clave en localStorage
     schema: 1,                      // versión del formato de datos
   },
@@ -497,6 +538,7 @@ const CONFIG = {
       cards: [                      // orden y visibilidad de las tarjetas de Inicio
         { id: 'balance', visible: true },
         { id: 'forecast', visible: true },
+        { id: 'tips', visible: true },
         { id: 'period', visible: true },
         { id: 'upcoming', visible: true },
         { id: 'saved', visible: true },
@@ -526,6 +568,7 @@ const CONFIG = {
   homeCards: {
     balance: 'Saldo disponible',
     forecast: 'Saldo de los próximos 60 días',
+    tips: 'Recomendaciones',
     period: 'Ingresos vs. gastos del periodo',
     upcoming: 'Próximos pagos',
     saved: 'Total ahorrado',
@@ -585,6 +628,25 @@ const CONFIG = {
   ],
 
   dateFormats: ['DD/MM/AAAA', 'MM/DD/AAAA', 'AAAA-MM-DD', 'D mmm AAAA'],
+
+  /* Formas de pagar una deuda en el simulador */
+  debtPlans: {
+    asap:  { chip: 'Próximo cobro', label: 'Todo con el primer cobro', col: 'Todo junto' },
+    split: { chip: 'Dividir', label: 'Dividido entre cobros', col: 'Dividido' },
+    due:   { chip: 'Fecha límite', label: 'Todo en la fecha límite', col: 'Último día' },
+    none:  { chip: 'No pagar', label: 'Sin pagar', col: 'Sin pagar' },
+  },
+
+  /* Umbrales de las recomendaciones (en % o en meses) */
+  tips: {
+    savingsRate: [10, 20],   // te queda menos de 10% = atención; 20% o más = bien
+    fixedMax: 50,            // gastos fijos arriba de este % del ingreso
+    emergencyMonths: [3, 6], // fondo de emergencia recomendado, en meses de gastos
+    cardUse: 30,             // uso de la línea de crédito recomendado (máximo %)
+    smallExpense: 200,       // "gastos hormiga": gastos de este monto o menos
+    categoryRise: 25,        // % arriba de tu promedio para avisar
+    hideDays: 30,            // días que se oculta una recomendación al tocar "Ocultar"
+  },
 
   limits: {
     maxScan: 6000,         // máximo de fechas que revisa el motor por regla (protección)
@@ -772,7 +834,8 @@ function newState() {
     schema: CONFIG.app.schema, setupDone: false, startDate: t,
     settings: clone(CONFIG.defaults),
     accounts: [], categories: defaultCategories(), rules: [], goals: [], holidays: [], scenarios: [],
-    meta: { notified: {}, savingsAppliedUntil: null, holidayYears: [], reminderShown: null },
+    sim: { debts: [], cardPlan: {}, extras: [] },   // deudas, formas de pago y extras del simulador (no son movimientos)
+    meta: { notified: {}, savingsAppliedUntil: null, holidayYears: [], reminderShown: null, tipsHidden: {} },
   };
 }
 /** Completa datos de versiones anteriores o importados con lo que falte */
@@ -786,6 +849,10 @@ function migrate(s) {
   out.settings.home.cards = out.settings.home.cards.filter((c) => CONFIG.homeCards[c.id]);
   for (const k of ['accounts', 'categories', 'rules', 'goals', 'holidays', 'scenarios']) if (!Array.isArray(out[k])) out[k] = [];
   out.meta = Object.assign(newState().meta, s.meta || {});
+  out.sim = Object.assign(newState().sim, isObj(s.sim) ? s.sim : {});
+  for (const k of ['debts', 'extras']) if (!Array.isArray(out.sim[k])) out.sim[k] = [];
+  if (!isObj(out.sim.cardPlan)) out.sim.cardPlan = {};
+  if (!isObj(out.meta.tipsHidden)) out.meta.tipsHidden = {};
   for (const r of out.rules) { r.exc = r.exc || {}; r.pauses = r.pauses || []; r.freq = normFreq(r.freq); r.created = r.created || out.startDate; }
   for (const g of out.goals) { g.history = g.history || []; }
   // los emojis de versiones anteriores se cambian por íconos vectoriales
@@ -1505,59 +1572,111 @@ function projection(opt = {}) {
 function goalEta() {
   return memo('eta', () => { const pr = projection({ end: D.addMonths(D.today(), 120) }); return Object.fromEntries(pr.goals.map((g) => [g.id, g.reached])); });
 }
+/* ---------- Deudas: cobros y formas de pago ---------- */
+const isLiquidAcc = (a) => !!a && !['credit', 'savings', 'vouchers'].includes(a.type);
+/** Días de cobro: ingresos recurrentes que llegan a efectivo o débito (o sin cuenta) */
+function paydayDates(from, to, rules) {
+  const set = new Set();
+  for (const o of allOccurrences(from, to, rules)) {
+    if (o.kind !== 'income' || o.status === 'skipped' || o.rule.freq.type === 'once') continue;
+    if (o.accountId && !isLiquidAcc(findAcc(o.accountId))) continue;
+    set.add(o.date);
+  }
+  return [...set].sort();
+}
+/** Fechas en que se paga una deuda según su forma de pago (CONFIG.debtPlans):
+ *  'asap' todo con el primer cobro · 'split' dividido entre los cobros hasta la fecha límite
+ *  'due' todo el último día · 'none' no se paga. Si no hay cobros en medio, se paga en la fecha límite. */
+function planDates(plan, from, due, paydays) {
+  if (plan === 'none') return [];
+  if (due < from) return [from];                       // ya venció: en cuanto se pueda
+  const inWin = paydays.filter((d) => d >= from && d <= due);
+  if (plan === 'asap') return [inWin[0] || due];
+  if (plan === 'split') return inWin.length ? inWin : [due];
+  return [due];
+}
+/** Reparte un monto en n partes iguales; la última absorbe los centavos */
+function splitAmount(total, n) {
+  n = Math.max(1, n); const part = Math.floor((total / n) * 100) / 100;
+  const out = Array(n).fill(part); out[n - 1] = round2(total - part * (n - 1)); return out;
+}
+/** Deudas del simulador que aún no vencen */
+function activeSimDebts() { const t = D.today(); return S.sim.debts.filter((x) => +x.amount > 0 && D.valid(x.due) && x.due >= t); }
+
 /* ---------- Simulador "¿cuánto tendré en tal fecha?" ----------
  * Simula cuenta por cuenta desde hoy hasta una fecha:
  *  - ingresos, gastos y transferencias programados (los variables con el monto
  *    mínimo, promedio o máximo según el ajuste de la proyección),
  *  - movimientos extra hipotéticos que el usuario agregue en el simulador,
  *  - el ahorro de su regla (sale de la cuenta elegida y va a las metas),
- *  - el pago completo de cada tarjeta en su fecha límite (opcional),
- *  - rendimientos con interés compuesto en cuentas y metas con tasa. */
+ *  - el pago de cada tarjeta y de cada deuda según su forma de pago
+ *    (con el primer cobro, dividido entre cobros, en la fecha límite o sin pagar),
+ *  - rendimientos con interés compuesto en cuentas y metas con tasa.
+ * opt: { applySavings, payCards, extras, debts, cardPlan: {idTarjeta: plan}, force: plan para todas } */
 function simulateTo(end, opt = {}) {
   const t = D.today(); if (!D.valid(end) || end < t) end = t;
   const rules = opt.rules || S.rules; const sv = opt.savings || S.settings.savings;
   const vmode = opt.variableMode || S.settings.projection.variableMode;
   const applySavings = opt.applySavings !== false; const payCards = opt.payCards !== false;
   const extras = opt.extras || [];
+  const debts = (opt.debts || []).filter((x) => +x.amount > 0 && D.valid(x.due));
+  const cardPlan = opt.cardPlan || {}; const force = opt.force || null;
+  const planOf = (p) => (force && p !== 'none' ? force : p);
   const key = `sim|${end}|${vmode}|${applySavings ? 1 : 0}|${payCards ? 1 : 0}`;
   const run = () => {
     const bal0 = accountBalances(); const bal = {};
     for (const a of S.accounts) bal[a.id] = bal0[a.id] || 0;
-    const isLiquid = (a) => a && a.type !== 'credit' && a.type !== 'savings' && a.type !== 'vouchers';
-    const liquidIds = S.accounts.filter(isLiquid).map((a) => a.id);
-    // cuenta principal (de aquí salen pagos de tarjeta y ahorro): la de débito con más saldo hoy
-    const mainId = S.accounts.filter((a) => isLiquid(a) && !a.archived).sort((x, y) => (x.type === 'debit' ? 0 : 1) - (y.type === 'debit' ? 0 : 1) || (bal0[y.id] || 0) - (bal0[x.id] || 0)).map((a) => a.id)[0] || null;
-    const mainLiquid = () => mainId;
+    const liquidIds = S.accounts.filter(isLiquidAcc).map((a) => a.id);
+    // cuenta principal (de aquí salen pagos de tarjeta, deudas y ahorro): la de débito con más saldo hoy
+    const mainId = S.accounts.filter((a) => isLiquidAcc(a) && !a.archived).sort((x, y) => (x.type === 'debit' ? 0 : 1) - (y.type === 'debit' ? 0 : 1) || (bal0[y.id] || 0) - (bal0[x.id] || 0)).map((a) => a.id)[0] || null;
     const goals = activeGoals().map((g) => ({ id: g.id, name: g.name, icon: g.icon, color: g.color, accountId: findAcc(g.accountId) ? g.accountId : null,
       start: goalSaved(g), value: goalSaved(g), target: +g.target || 0, priority: +g.priority || 3, percent: +g.percent || 0, deadline: g.deadline,
       rate: g.rate !== '' && g.rate != null ? +g.rate : accRate(g.accountId), reached: null }));
+    const debtLeft = {}; for (const x of debts) debtLeft[x.id] = +x.amount;
+    const otherNow = () => round2(sum(Object.values(debtLeft)));
     const liquidNow = () => round2(sum(liquidIds, (id) => bal[id] || 0));
-    const netNow = () => round2(sum(S.accounts, (a) => bal[a.id] || 0) + sum(goals.filter((g) => !g.accountId), (g) => g.value));
+    const netNow = () => round2(sum(S.accounts, (a) => bal[a.id] || 0) + sum(goals.filter((g) => !g.accountId), (g) => g.value) - otherNow());
     const savedNow = () => round2(sum(S.accounts.filter((a) => a.type === 'savings'), (a) => bal[a.id] || 0) + sum(goals.filter((g) => !g.accountId), (g) => g.value));
     const vouchersNow = () => round2(sum(S.accounts.filter((a) => a.type === 'vouchers'), (a) => bal[a.id] || 0));
     const debtNow = () => round2(sum(S.accounts.filter((a) => a.type === 'credit'), (a) => Math.max(0, -(bal[a.id] || 0))));
 
     // eventos
-    const ev = []; const RANK = { income: 0, transfer: 1, expense: 2, extra: 2, cut: 3, cardpay: 4, save: 5 };
-    const occs = allOccurrences(D.add(t, -90), end, rules === S.rules ? null : rules).filter((o) => o.status === 'scheduled' || o.status === 'pending');
+    const ev = []; const RANK = { income: 0, transfer: 1, expense: 2, extra: 2, cut: 3, cardpay: 4, debtpay: 4, save: 5 };
+    const ruleArg = rules === S.rules ? null : rules;
+    const occs = allOccurrences(D.add(t, -90), end, ruleArg).filter((o) => o.status === 'scheduled' || o.status === 'pending');
     for (const o of occs) {
       if (o.kind === 'adjust') continue;
       ev.push({ d: o.date < t ? t : o.date, kind: o.kind, amt: o.hasAmount ? o.amount : baseAmount(o.rule, vmode), from: o.accountId, to: o.toAccountId, name: o.name, cat: o.categoryId });
     }
     for (const x of extras) if (x.date >= t && x.date <= end && +x.amount > 0) ev.push({ d: x.date, kind: x.kind, amt: +x.amount, from: x.accountId, name: x.name || (x.kind === 'income' ? 'Ingreso extra' : 'Gasto extra'), extra: true });
-    if (applySavings) for (const s of savingsEvents(sv, end, ev.filter((e) => !isVoucher(e.from)).map((e) => ({ d: e.d, inc: e.kind === 'income' ? e.amt : 0, exp: e.kind === 'expense' ? e.amt : 0 })))) ev.push({ d: s.d, kind: 'save', amt: s.save });
-    if (payCards) for (const a of S.accounts.filter((x) => x.type === 'credit' && !x.archived)) {
+    // cobros hasta la fecha límite más lejana (para saber en cuántas partes se divide cada deuda)
+    const cards = payCards ? S.accounts.filter((x) => x.type === 'credit' && !x.archived) : [];
+    let far = end; for (const x of debts) if (x.due > far) far = x.due;
+    if (cards.length) far = D.max(far, D.add(end, 70));
+    const paydays = debts.length || cards.length ? paydayDates(t, D.min(far, D.add(t, 800)), ruleArg) : [];
+    for (const x of debts) {
+      const plan = planOf(x.plan || 'split') === 'none' ? 'due' : planOf(x.plan || 'split');
+      const dates = planDates(plan, t, x.due, paydays); const parts = splitAmount(+x.amount, dates.length);
+      const from = x.accountId && isLiquidAcc(findAcc(x.accountId)) ? x.accountId : mainId;
+      dates.forEach((d, i) => { if (d <= end) ev.push({ d, kind: 'debtpay', debt: x.id, amt: parts[i], from, name: x.name, due: x.due, part: i, of: dates.length }); });
+    }
+    if (applySavings) for (const s of savingsEvents(sv, end, ev.filter((e) => !isVoucher(e.from)).map((e) => ({ d: e.d, inc: e.kind === 'income' ? e.amt : 0, exp: e.kind === 'expense' || e.kind === 'debtpay' ? e.amt : 0 })))) ev.push({ d: s.d, kind: 'save', amt: s.save });
+    for (const a of cards) {
+      const plan = planOf(cardPlan[a.id] || 'due'); if (plan === 'none') continue;
       const c = cardInfo(a);
-      if (c.pendingLast > 0) ev.push({ d: D.max(c.dueLast, t), kind: 'cardpay', card: a.id, fixed: c.pendingLast });
+      const add = (from, due, fixed) => planDates(plan, from, due, paydays).forEach((d, i, arr) => { if (d <= end) ev.push({ d, kind: 'cardpay', card: a.id, fixed, part: i, of: arr.length, due }); });
+      if (c.pendingLast > 0) add(t, c.dueLast, c.pendingLast);
       for (let cut = c.nextCut, k = 0; cut <= end && k < 400; cut = cutDateOn(a, D.p(cut).y, D.p(cut).m + 1), k++) {
         ev.push({ d: cut, kind: 'cut', card: a.id });
-        const due = dueAfterCut(a, cut); if (due <= end) ev.push({ d: due, kind: 'cardpay', card: a.id });
+        add(cut, dueAfterCut(a, cut), null);
       }
     }
     ev.sort((x, y) => (x.d < y.d ? -1 : x.d > y.d ? 1 : (RANK[x.kind] || 0) - (RANK[y.kind] || 0)));
 
     // simulación
-    const R = { inc: 0, exp: 0, saved: 0, interest: 0, cardPaid: 0, extraIn: 0, extraOut: 0, byName: {} };
+    const R = { inc: 0, exp: 0, saved: 0, interest: 0, cardPaid: 0, debtPaid: 0, extraIn: 0, extraOut: 0, byName: {} };
+    const pays = [];                                    // cada pago de tarjeta o deuda: {d, ref, kind, amt, due}
+    const after = {};                                   // disponible al cerrar cada día con movimientos
     const stmt = {}, paid = {}; let last = t;
     const grow = (to) => {
       const days = D.diff(last, to); if (days <= 0) return;
@@ -1587,13 +1706,17 @@ function simulateTo(end, opt = {}) {
         } else if (e.kind === 'cut') {
           stmt[e.card] = Math.max(0, -(bal[e.card] || 0)); paid[e.card] = 0;
         } else if (e.kind === 'cardpay') {
+          // cada parte paga lo que falta entre las partes que quedan (la última liquida el resto)
           const owed = e.fixed != null ? e.fixed : (stmt[e.card] || 0);
-          const amt = round2(Math.max(0, Math.min(owed - (paid[e.card] || 0), Math.max(0, -(bal[e.card] || 0)))));
-          const src = mainLiquid();
-          if (amt > 0 && src) { bal[src] -= amt; bal[e.card] += amt; paid[e.card] = (paid[e.card] || 0) + amt; R.cardPaid += amt; }
-          if (e.fixed != null) paid[e.card] = 0;
+          const left = Math.max(0, owed - (paid[e.card] || 0));
+          const amt = round2(Math.max(0, Math.min(left / Math.max(1, e.of - e.part), Math.max(0, -(bal[e.card] || 0)))));
+          if (amt > 0 && mainId) { bal[mainId] -= amt; bal[e.card] += amt; paid[e.card] = (paid[e.card] || 0) + amt; R.cardPaid += amt; pays.push({ d: e.d, ref: e.card, kind: 'card', amt, due: e.due }); }
+          if (e.fixed != null && e.part === e.of - 1) paid[e.card] = 0;
+        } else if (e.kind === 'debtpay') {
+          const amt = round2(Math.min(e.amt, debtLeft[e.debt] || 0));
+          if (amt > 0) { if (e.from) bal[e.from] -= amt; debtLeft[e.debt] = round2(debtLeft[e.debt] - amt); R.debtPaid += amt; pays.push({ d: e.d, ref: e.debt, kind: 'debt', amt, due: e.due }); }
         } else if (e.kind === 'save') {
-          const src = sv.fromAccountId && findAcc(sv.fromAccountId) ? sv.fromAccountId : mainLiquid();
+          const src = sv.fromAccountId && findAcc(sv.fromAccountId) ? sv.fromAccountId : mainId;
           const mode = sv.distribution === 'manual' ? (goals.some((g) => g.percent > 0) ? 'percent' : 'priority') : sv.distribution;
           const { alloc } = allocate(e.amt, mode, goals.map((g) => ({ id: g.id, need: Math.max(0, g.target - g.value), priority: g.priority, percent: g.percent, deadline: g.deadline })));
           for (const [id, a] of Object.entries(alloc)) {
@@ -1602,7 +1725,7 @@ function simulateTo(end, opt = {}) {
           }
         }
         for (const g of goals) if (!g.reached && g.target > 0 && g.value >= g.target - 0.005) g.reached = e.d;
-        checkLow(e.d);
+        checkLow(e.d); after[e.d] = liquidNow();
       }
       grow(d); snap(d);
       if (d >= end) break;
@@ -1611,16 +1734,28 @@ function simulateTo(end, opt = {}) {
       .map((a) => ({ acc: a, start: bal0[a.id] || 0, end: round2(bal[a.id] || 0) }));
     const p0 = points[0], p1 = points[points.length - 1];
     return {
-      end, points, accounts, goals, low, firstNeg,
+      end, points, accounts, goals, low, firstNeg, pays, after, paydays: paydays.filter((d) => d <= end),
       liquid0: p0.liquid, liquid1: p1.liquid, net0: p0.net, net1: p1.net, saved0: p0.saved, saved1: p1.saved,
       debt0: round2(sum(S.accounts.filter((a) => a.type === 'credit'), (a) => Math.max(0, -(bal0[a.id] || 0)))), debt1: debtNow(),
+      other0: round2(sum(debts, (x) => +x.amount)), other1: otherNow(),
       vouchers0: round2(sum(S.accounts.filter((a) => a.type === 'vouchers'), (a) => bal0[a.id] || 0)), vouchers1: vouchersNow(), hasVouchers: S.accounts.some((a) => a.type === 'vouchers' && !a.archived),
-      inc: round2(R.inc), exp: round2(R.exp), saved: round2(R.saved), interest: round2(R.interest), cardPaid: round2(R.cardPaid),
+      inc: round2(R.inc), exp: round2(R.exp), saved: round2(R.saved), interest: round2(R.interest), cardPaid: round2(R.cardPaid), debtPaid: round2(R.debtPaid),
       extraIn: round2(R.extraIn), extraOut: round2(R.extraOut),
       topExpenses: Object.values(R.byName).sort((a, b) => b.total - a.total).slice(0, 6),
     };
   };
-  return extras.length || opt.rules || opt.savings ? run() : memo(key, run);
+  const custom = extras.length || debts.length || Object.keys(cardPlan).length || force || opt.rules || opt.savings;
+  return custom ? run() : memo(key, run);
+}
+/** Compara formas de pagar todas las deudas a la vez: con el primer cobro, dividido o en la fecha límite */
+function debtCompare(end, base) {
+  return ['asap', 'split', 'due'].map((plan) => {
+    const r = simulateTo(end, Object.assign({}, base, { force: plan }));
+    const byDay = {}; for (const p of r.pays) byDay[p.d] = round2((byDay[p.d] || 0) + p.amt);
+    // disponible al cierre de cada día de cobro, después de pagar lo que toque ese día
+    const atPay = r.paydays.map((d) => ({ d, liquid: r.after[d] != null ? r.after[d] : null, paid: byDay[d] || 0 }));
+    return { plan, r, low: r.low, firstNeg: r.firstNeg, byDay, atPay };
+  });
 }
 
 /* ---------- Datos para las gráficas de decisiones ---------- */
@@ -1664,7 +1799,7 @@ function healthKpis() {
     }
     const lim = sum(activeAccounts().filter((a) => a.type === 'credit'), (a) => +a.limit || 0);
     if (lim > 0) { const u = (tt.debt / lim) * 100; out.push({ id: 'cards', label: 'Uso de tarjetas', value: `${Math.round(u)}%`, status: st(u, 30, 60, false), note: 'de tu límite', hint: 'Usar menos de 30% del límite cuida tu historial de crédito.' }); }
-    return { list: out, inc, exp };
+    return { list: out, inc, exp, fixed, basis };
   });
 }
 /** Gasto por categoría del periodo contra presupuesto y contra el promedio de periodos anteriores */
@@ -1743,6 +1878,221 @@ function collectAlerts() {
     }
     return out;
   });
+}
+
+/* ---------- Recomendaciones ----------
+ * Reglas sencillas sobre tus propios datos. Cada una da un consejo con:
+ *   level: 'bad' (atender ya) · 'warn' (conviene mejorar) · 'info' (idea) · 'good' (vas bien)
+ *   title, text (con tus números), y si aplica act/arg/actLabel para un botón.
+ * Los umbrales están en CONFIG.tips. */
+function monthsText(m) {
+  if (m >= 10) return `${Math.round(m)} meses`;
+  const v = Math.round(m * 10) / 10; if (v === 1) return '1 mes';
+  return `${String(v).replace('.', S.settings.format.decimalSep)} meses`;
+}
+/** Gastos recurrentes con su equivalente mensual (próximos 12 meses / 12) */
+function recurringMonthly() {
+  return memo('recMonthly', () => {
+    const t = D.today(); const by = {};
+    for (const o of allOccurrences(t, D.add(t, 364))) {
+      if (o.kind !== 'expense' || o.status === 'skipped' || o.rule.freq.type === 'once') continue;
+      const x = (by[o.ruleId] = by[o.ruleId] || { rule: o.rule, total: 0 });
+      x.total += o.hasAmount ? o.amount : baseAmount(o.rule);
+    }
+    return Object.values(by).map((x) => ({ rule: x.rule, monthly: round2(x.total / 12) })).filter((x) => x.monthly > 0).sort((a, b) => b.monthly - a.monthly);
+  });
+}
+const catMatches = (catId, re) => [findCat(catId), findCat(topCatId(catId))].some((c) => c && re.test(c.name));
+function recommendations() {
+  return memo('tips', () => {
+    if (!S.rules.length && !S.accounts.length) return [];
+    const T = CONFIG.tips; const t = D.today(); const out = []; const add = (o) => out.push(Object.assign({ weight: 0 }, o));
+    const m0 = (v) => money(v, { decimals: 0 });
+    const k = healthKpis(); const inc = k.inc, exp = k.exp; const tt = totals(); const p = periodOf(t);
+    const cards = activeAccounts().filter((a) => a.type === 'credit');
+
+    // ¿Me alcanza? saldo negativo en los próximos 60 días
+    const fc = simulateTo(D.add(t, 60));
+    if (fc.firstNeg) add({ id: 'neg', level: 'bad', icon: 'alert', title: `Tu dinero no alcanza el ${fmtDate(fc.firstNeg, 'long')}`,
+      text: `Con tus pagos programados llegarías a ${m0(fc.low.value)} el ${fmtDate(fc.low.date, 'long')}. Mueve o reduce un gasto antes de esa fecha, pasa dinero de tu ahorro o baja el ahorro de este periodo.`,
+      act: 'gotoSim', arg: fc.low.date, actLabel: 'Revisar en el simulador', weight: -fc.low.value });
+
+    // Tarjetas: pagos vencidos, uso de la línea y pagos que se pueden dividir
+    for (const a of cards) {
+      const c = cardInfo(a);
+      if (c.overdue) add({ id: 'over-' + a.id, level: 'bad', icon: 'card', title: `Pago vencido de ${a.name}`,
+        text: `Debes ${m0(c.pendingLast)} desde el ${fmtDate(c.dueLast, 'long')}. Págalo cuanto antes: después de la fecha límite se cobran intereses y comisión, y puede afectar tu historial de crédito.`,
+        act: 'openAccount', arg: a.id, actLabel: 'Ver tarjeta', weight: c.pendingLast });
+      if (c.limit > 0 && c.used > T.cardUse) {
+        const need = round2(c.debt - (c.limit * T.cardUse) / 100);
+        add({ id: 'use-' + a.id, level: c.used > 60 ? 'warn' : 'info', icon: 'card', title: `Usas el ${Math.round(c.used)}% de tu línea en ${a.name}`,
+          text: `Lo recomendable es quedarte debajo del ${T.cardUse}%: cuida tu historial de crédito y te deja margen para emergencias. Para llegar ahí tendrías que bajar tu saldo unos ${m0(need)}.`,
+          act: 'openAccount', arg: a.id, actLabel: 'Ver tarjeta', weight: need });
+      }
+      // ¿el pago del corte actual o del siguiente cae después de dos o más cobros?
+      const cand = [];
+      if (c.pendingLast > 0 && c.dueLast >= t) cand.push({ pend: true, amt: c.pendingLast, from: t, due: c.dueLast });
+      if (c.nextStatement > 0) cand.push({ pend: false, amt: c.nextStatement, from: c.nextCut, due: c.dueNext });
+      const sp = cand.map((x) => Object.assign(x, { n: paydayDates(t, x.due).filter((d) => d >= x.from).length })).find((x) => x.n >= 2);
+      if (sp && (S.sim.cardPlan[a.id] || 'due') !== 'split') add({ id: 'split-' + a.id, level: 'info', icon: 'calRange', title: `Puedes dividir el pago de ${a.name}`,
+        text: `${sp.pend ? `Tu pago de ${m0(sp.amt)}` : `El pago de tu próximo corte (unos ${m0(sp.amt)})`} vence el ${fmtDate(sp.due, 'long')} y antes cobras ${sp.n} veces. En lugar de pagarlo de golpe, aparta unos ${m0(sp.amt / sp.n)} en cada cobro.`,
+        act: 'gotoSim', arg: '', actLabel: 'Probar en el simulador', weight: sp.amt / 10 });
+    }
+
+    // Deuda alta en tarjetas frente al ingreso
+    if (tt.debt > 0 && inc > 0 && tt.debt > inc * 0.5) add({ id: 'debt', level: tt.debt > inc ? 'warn' : 'info', icon: 'card',
+      title: tt.debt > inc ? 'Tu deuda en tarjetas es mayor que tu ingreso del mes' : 'Tu deuda en tarjetas es más de la mitad de tu ingreso',
+      text: `Debes ${m0(tt.debt)} y ganas unos ${m0(inc)} al mes. Antes de ahorrar para metas que no son urgentes, conviene liquidarla: el interés de una tarjeta suele ser mucho más alto que lo que gana cualquier ahorro. Paga el total de cada corte para no generar intereses.`,
+      act: 'gotoAccounts', actLabel: 'Ver mis tarjetas', weight: tt.debt });
+
+    // ¿Cuánto te queda de lo que ganas?
+    const sv = S.settings.savings;
+    if (inc > 0) {
+      const rate = ((inc - exp) / inc) * 100; const [r1, r2] = T.savingsRate;
+      const cc = categoryCompare(p).slice(0, 2).map((r) => r.cat.name);
+      if (rate < 0) add({ id: 'rate', level: 'bad', icon: 'trendDown', title: 'Gastas más de lo que ganas',
+        text: `En promedio salen ${m0(exp - inc)} más de lo que entra cada mes (${k.basis}).${cc.length ? ` Empieza por revisar lo que más pesa: ${listJoin(cc)}.` : ''}`,
+        act: 'gotoPj', arg: 'charts', actLabel: 'Ver mis gráficas', weight: exp - inc });
+      else if (rate < r1) add({ id: 'rate', level: 'warn', icon: 'piggy', title: `Solo te queda el ${Math.round(rate)}% de lo que ganas`,
+        text: `Intenta llegar al ${r1}% y después al ${r2}%. Para el ${r1}% tendrías que liberar unos ${m0((inc * r1) / 100 - (inc - exp))} al mes (${k.basis}).`,
+        act: 'gotoPj', arg: 'charts', actLabel: 'Ver en qué se va', weight: (inc * r1) / 100 - (inc - exp) });
+      else if (rate < r2) add({ id: 'rate', level: 'info', icon: 'piggy', title: `Te queda el ${Math.round(rate)}% de lo que ganas`,
+        text: `Vas bien. El siguiente paso es el ${r2}%: unos ${m0((inc * r2) / 100 - (inc - exp))} más al mes.`, weight: 1 });
+      else add({ id: 'rate', level: 'good', icon: 'okCircle', title: `Te queda el ${Math.round(rate)}% de lo que ganas`,
+        text: `Estás arriba de la meta común del ${r2}%. Asegúrate de que ese dinero llegue a tus metas y no se quede en la cuenta de gastos.` });
+      // ahorrar primero, no lo que sobre
+      if (sv.type === 'leftover' && rate >= 5) {
+        const pct = Math.max(5, Math.floor((rate * 0.75) / 5) * 5);
+        add({ id: 'payfirst', level: 'info', icon: 'save', title: 'Aparta tu ahorro en cuanto cobres',
+          text: `Tu regla es ahorrar lo que sobre al final, y eso casi siempre termina en menos. Con lo que te queda hoy podrías apartar el ${pct}% de cada ingreso desde el día de cobro.`,
+          act: 'openSection', arg: 'savings', actLabel: 'Cambiar mi regla', weight: 2 });
+      }
+      if ((sv.type === 'fixed' && !(+sv.fixed > 0)) || (sv.type === 'percent' && !(+sv.percent > 0))) add({ id: 'norule', level: 'info', icon: 'piggy', title: 'Define cuánto ahorrar cada periodo',
+        text: 'Tu regla de ahorro está en cero. Aunque sea poco, un monto fijo o un porcentaje de cada ingreso hace que el ahorro pase sin pensarlo.',
+        act: 'openSection', arg: 'savings', actLabel: 'Poner mi regla', weight: 3 });
+
+      // Gastos fijos
+      const fr = (k.fixed / inc) * 100;
+      if (fr > T.fixedMax) {
+        const top = recurringMonthly().filter((x) => !x.rule.variable).slice(0, 3);
+        add({ id: 'fixed', level: fr > 70 ? 'warn' : 'info', icon: 'home', title: `Tus gastos fijos se llevan el ${Math.round(fr)}% de tu ingreso`,
+          text: `Arriba del ${T.fixedMax}% queda poco margen para imprevistos.${top.length ? ` Los más grandes: ${listJoin(top.map((x) => `${x.rule.name} (${m0(x.monthly)} al mes)`))}.` : ''} Renegociar o cambiar alguno libera dinero todos los meses.`,
+          act: 'gotoRules', actLabel: 'Ver mis recurrentes', weight: k.fixed - (inc * T.fixedMax) / 100 });
+      }
+    }
+
+    // Fondo de emergencia
+    if (exp > 0) {
+      const months = tt.saved / exp; const [lo, hi] = T.emergencyMonths;
+      const eg = activeGoals().find((g) => /emergenc|imprevist|colch/i.test(g.name));
+      if (months < lo) add({ id: 'emerg', level: months < 1 ? 'warn' : 'info', icon: 'shield', title: months < 1 ? 'Arma un fondo de emergencia' : 'Sigue con tu fondo de emergencia',
+        text: `Sin contar lo que tienes en efectivo y débito, tu ahorro cubre ${monthsText(months)} de gastos. Lo recomendable es de ${lo} a ${hi} meses: entre ${m0(exp * lo)} y ${m0(exp * hi)}. ${months < 1 ? `Empieza por juntar un mes: ${m0(exp)}.` : `Te faltan ${m0(exp * lo - tt.saved)} para llegar a ${lo} meses.`}`,
+        act: eg ? 'contribute' : 'newEmergencyGoal', arg: eg ? eg.id : String(Math.round(exp * lo)), actLabel: eg ? `Abonar a "${eg.name}"` : 'Crear la meta', weight: exp * lo - tt.saved });
+      else add({ id: 'emerg', level: 'good', icon: 'shield', title: `Tu ahorro cubre ${monthsText(months)} de gastos`,
+        text: months >= hi ? `Ya pasaste los ${hi} meses recomendados. Lo que ahorres de más puede ir a otras metas o a inversiones con mejor rendimiento.` : `Está dentro de lo recomendado (${lo} a ${hi} meses).` });
+    }
+
+    // Dinero de más en efectivo y débito
+    const idle = round2(tt.liquid - exp * 1.5);
+    if (exp > 0 && idle > Math.max(1000, exp * 0.25)) {
+      const sav = activeAccounts().filter((a) => a.type === 'savings' && +a.rate > 0).sort((a, b) => b.rate - a.rate)[0];
+      let text = `Es lo que tienes en efectivo y débito por encima de mes y medio de gastos. `;
+      if (tt.debt > idle * 0.2) text += `Lo primero sería bajar tu deuda de tarjetas (${m0(tt.debt)}).`;
+      else if (sav) text += `En ${sav.name} (${sav.rate}% anual) te daría unos ${m0((idle * sav.rate) / 100)} al año.`;
+      else text += 'En una cuenta de ahorro o inversión con rendimiento trabajaría para ti, o puedes adelantar tus metas.';
+      add({ id: 'idle', level: 'info', icon: 'trendUp', title: `Tienes ${m0(idle)} que no necesitas para tus gastos`, text,
+        act: tt.debt > idle * 0.2 ? 'gotoAccounts' : activeGoals().length ? 'distribute' : 'newGoal', actLabel: tt.debt > idle * 0.2 ? 'Ver mis tarjetas' : activeGoals().length ? 'Repartir a mis metas' : 'Crear una meta', weight: idle / 20 });
+    }
+
+    // Presupuestos y categorías que suben
+    for (const b of budgetAlerts(p).filter((x) => x.level === 'over').slice(0, 3)) add({ id: 'bud-' + b.cat.id, level: 'warn', icon: b.cat.icon, title: `Te pasaste del presupuesto de ${b.cat.name}`,
+      text: `Llevas ${m0(b.spent)} de ${m0(b.budget)} y faltan ${daysText(D.diff(t, p.end) + 1)} para cerrar el periodo. Intenta no gastar más en esto hasta tu siguiente cobro, o ajusta el presupuesto si se quedó corto.`,
+      act: 'openCategory', arg: b.cat.id, actLabel: 'Ver categoría', weight: b.spent - b.budget });
+    const cc = categoryCompare(p); let rises = 0;
+    for (const r of cc) {
+      if (r.avg == null || r.avg <= 0 || rises >= 2) continue;
+      const now = r.spent + r.sched; const d = ((now - r.avg) / r.avg) * 100;
+      if (d >= T.categoryRise && now - r.avg >= Math.max(300, inc * 0.02) && !(+r.budget > 0 && r.spent > r.budget)) {
+        rises++;
+        add({ id: 'rise-' + r.cat.id, level: 'info', icon: r.cat.icon, title: `Este periodo gastas más en ${r.cat.name}`,
+          text: `${m0(now)} contra ${m0(r.avg)} de tu promedio (${Math.round(d)}% más). Si fue algo puntual, no pasa nada; si se repite, ponle un presupuesto.`,
+          act: 'openCategory', arg: r.cat.id, actLabel: 'Ver categoría', weight: now - r.avg });
+      }
+    }
+    if (!S.categories.some((c) => +c.budget > 0) && cc.length >= 2) add({ id: 'nobud', level: 'info', icon: 'tag', title: 'Ponle tope a tus gastos',
+      text: `Tus categorías con más gasto este periodo son ${listJoin(cc.slice(0, 3).map((r) => r.cat.name))}. Con un presupuesto por periodo, la app te avisa antes de pasarte.`,
+      act: 'gotoBudgets', actLabel: 'Poner presupuestos', weight: 1 });
+
+    // Suscripciones
+    const SUBS = /netflix|spotify|disney|hbo|\bmax\b|prime|youtube|apple|icloud|xbox|playstation|crunchyroll|paramount|vix|gimnasio|\bgym\b|streaming/i;
+    const subs = recurringMonthly().filter((x) => catMatches(x.rule.categoryId, /suscrip|stream/i) || SUBS.test(x.rule.name));
+    const subsM = sum(subs, (x) => x.monthly);
+    if (subs.length >= 2 || (subs.length && inc > 0 && subsM > inc * 0.03)) add({ id: 'subs', level: 'info', icon: 'tv', title: `Pagas ${m0(subsM)} al mes en suscripciones`,
+      text: `Son unos ${m0(subsM * 12)} al año entre ${listJoin(subs.slice(0, 4).map((x) => x.rule.name))}${subs.length > 4 ? ' y otras' : ''}. Revisa cuáles usaste el último mes y cancela o pausa las demás.`,
+      act: 'gotoRules', actLabel: 'Ver mis recurrentes', weight: subsM });
+
+    // Metas
+    const goals = activeGoals(); let behind = 0;
+    for (const g of goals) {
+      const gi = goalInfo(g);
+      if (gi.behind) { behind++; add({ id: 'goal-' + g.id, level: 'warn', icon: g.icon || 'target', title: `Vas atrasado en "${g.name}"`,
+        text: `Llevas ${m0(gi.saved)} y a estas alturas deberías llevar ${m0(gi.expected)}.${gi.perPeriod ? ` Para llegar el ${fmtDate(g.deadline, 'long')} necesitas ${m0(gi.perPeriod)} por ${gi.unit}.` : ''}`,
+        act: 'contribute', arg: g.id, actLabel: 'Abonar', weight: gi.expected - gi.saved }); }
+      else if (gi.overdue) add({ id: 'goalo-' + g.id, level: 'info', icon: 'calendar', title: `La fecha de "${g.name}" ya pasó`,
+        text: `Te faltan ${m0(gi.remaining)}. Ponle una fecha nueva para saber cuánto apartar en cada cobro.`, act: 'editGoal', arg: g.id, actLabel: 'Cambiar fecha', weight: 1 });
+    }
+    if (goals.some((g) => g.deadline && !goalInfo(g).reached) && !behind) add({ id: 'goalsok', level: 'good', icon: 'target', title: 'Tus metas van a tiempo', text: 'Con lo que llevas, vas al ritmo para llegar a tus fechas límite.' });
+    if (!goals.length && inc > 0) add({ id: 'nogoal', level: 'info', icon: 'target', title: 'Ponle nombre y fecha a tu ahorro',
+      text: 'Ahorrar para algo concreto (un fondo de emergencia, un viaje, un enganche) hace más fácil no gastarlo. La app te dice cuánto apartar en cada cobro.',
+      act: 'newGoal', actLabel: 'Crear una meta', weight: 1 });
+
+    // Meses apretados más adelante (después del pronóstico de 60 días)
+    const lim = D.som(D.add(t, 61));
+    const tight = monthlySeries().find((x) => x.future && x.m >= lim && x.net < 0);
+    if (tight) {
+      const mUntil = Math.max(1, D.months(D.som(t), tight.m));
+      add({ id: 'tight-' + tight.m, level: 'warn', icon: 'calendar', title: `${fmtDate(tight.m, 'month').replace(/^./, (c) => c.toUpperCase())} viene apretado`,
+        text: `Ese mes tus gastos programados (${m0(tight.exp)}) superan tus ingresos (${m0(tight.inc)}) por ${m0(-tight.net)}. Si apartas unos ${m0(-tight.net / mUntil)} al mes desde ahora, llegas sin problema.`,
+        act: 'gotoPj', arg: 'charts', actLabel: 'Ver meses', weight: -tight.net });
+    }
+
+    // Vales de despensa
+    if (tt.hasVouchers && tt.vouchers > 0) {
+      const FOOD = /s[uú]per|despensa|mandado|abarrote|comida/i;
+      const food = recurringMonthly().filter((x) => !isVoucher(x.rule.accountId) && (FOOD.test(x.rule.name) || catMatches(x.rule.categoryId, FOOD)));
+      if (food.length) add({ id: 'vales', level: 'info', icon: 'ticket', title: 'Usa tus vales para el súper',
+        text: `Tienes ${m0(tt.vouchers)} en vales y pagas ${listJoin(food.slice(0, 2).map((x) => x.rule.name))} con otra cuenta. Si lo pagas con vales, dejas hasta ${m0(Math.min(tt.vouchers, sum(food, (x) => x.monthly)))} libres en tu débito.`,
+        act: 'openRule', arg: food[0].rule.id, actLabel: `Cambiar "${food[0].rule.name}"`, weight: Math.min(tt.vouchers, food[0].monthly) });
+    }
+
+    // Gastos pequeños de los últimos 30 días
+    const small = allOccurrences(D.add(t, -30), t).filter((o) => o.kind === 'expense' && o.status === 'done' && o.amount > 0 && o.amount <= T.smallExpense && !isVoucher(o.accountId));
+    const smallSum = sum(small, (o) => o.amount);
+    if (small.length >= 8 && smallSum >= Math.max(500, inc * 0.03)) add({ id: 'small', level: 'info', icon: 'coffee', title: `Gastos pequeños: ${m0(smallSum)} en 30 días`,
+      text: `Fueron ${small.length} gastos de ${m0(T.smallExpense)} o menos. Por separado no se notan, pero a este ritmo son unos ${m0(smallSum * 12)} al año. Ponles un tope por semana.`, weight: smallSum });
+
+    // Ingresos variables
+    const vr = S.rules.filter((r) => r.kind === 'income' && r.variable && !ruleIsPaused(r) && r.min != null && r.max != null);
+    if (vr.length && S.settings.projection.variableMode !== 'min') add({ id: 'varinc', level: 'info', icon: 'scale', title: 'Planea con tu ingreso mínimo',
+      text: `${listJoin(vr.map((r) => r.name))} ${vr.length > 1 ? 'cambian' : 'cambia'} cada vez. Si haces tus cuentas con el mínimo, los meses buenos se vuelven ahorro extra en lugar de gasto.`,
+      act: 'setVarMode', arg: 'min', actLabel: 'Usar el mínimo', weight: 1 });
+
+    // Lo que vas haciendo bien
+    if (cards.length && !cards.some((a) => cardInfo(a).overdue) && !cards.some((a) => cardInfo(a).limit > 0 && cardInfo(a).used > T.cardUse))
+      add({ id: 'cardsok', level: 'good', icon: 'card', title: 'Tus tarjetas están en orden', text: `Sin pagos vencidos y usando menos del ${T.cardUse}% de tu línea.` });
+    if (S.categories.some((c) => +c.budget > 0) && !budgetAlerts(p).some((b) => b.level === 'over'))
+      add({ id: 'budok', level: 'good', icon: 'tag', title: 'Vas dentro de tus presupuestos', text: 'Ninguna categoría se ha pasado de su tope en este periodo.' });
+    if (!fc.firstNeg && fc.low.value > 0 && exp > 0 && S.accounts.length) add({ id: 'cashok', level: 'good', icon: 'okCircle', title: 'Te alcanza los próximos 60 días',
+      text: `Tu punto más bajo sería ${m0(fc.low.value)} el ${fmtDate(fc.low.date, 'long')}.` });
+
+    const ORD = { bad: 0, warn: 1, info: 2, good: 3 };
+    return out.sort((a, b) => ORD[a.level] - ORD[b.level] || b.weight - a.weight);
+  });
+}
+/** Recomendaciones que el usuario ocultó hace menos de CONFIG.tips.hideDays días */
+function hiddenTipIds() {
+  const t = D.today(); const h = S.meta.tipsHidden || {};
+  return new Set(Object.keys(h).filter((id) => D.valid(h[id]) && D.diff(h[id], t) < CONFIG.tips.hideDays));
 }
 
 /* =========================================================================
@@ -2306,7 +2656,7 @@ function settingChanged(path, v) {
  * 7. VISTAS
  * ========================================================================= */
 const UI = { tab: 'home', mv: 'list', mvRef: null, filter: 'all', q: '', cal: null, pj: 'charts', sim: { changes: [], loadedId: null },
-  sd: { date: null, savings: true, cards: true, extras: [] } };   // sd = simulador por fecha
+  sd: { date: null, savings: true } };   // sd = simulador por fecha (deudas y extras se guardan en S.sim)
 const TABS = [['home', 'Inicio', 'home'], ['moves', 'Movimientos', 'list'], ['goals', 'Metas', 'target'], ['proj', 'Proyección', 'chart'], ['settings', 'Ajustes', 'sliders']];
 const VIEWS = {};
 
@@ -2467,6 +2817,14 @@ const HOME = {
   forecast() {
     if (!S.accounts.length) return '';
     return forecastPanel(60, 'ch-home-fc', true);
+  },
+  tips() {
+    const all = recommendations(); if (!all.length) return '';
+    const hid = hiddenTipIds(); const vis = all.filter((x) => !hid.has(x.id) && x.level !== 'good');
+    const good = all.filter((x) => x.level === 'good').length;
+    const body = vis.length ? `<div class="list">${vis.slice(0, 3).map((x) => `<button type="button" class="item tip-row" data-act="gotoPj" data-v="tips"><span class="ico sm tip-ico ${x.level}" aria-hidden="true">${ico(x.icon)}</span><span class="item-main"><span class="item-title">${esc(x.title)}</span><span class="item-sub">${TIP_LEVEL[x.level]}</span></span><span class="chev" aria-hidden="true">${IC.right}</span></button>`).join('')}</div>`
+      : `<div class="row" style="gap:.5rem"><span class="i" style="color:var(--st-good)" aria-hidden="true">${IC.okCircle}</span><span>Todo en orden${good ? `: ${good === 1 ? '1 cosa va' : good + ' cosas van'} bien` : ''}.</span></div>`;
+    return panel('Recomendaciones', body, { link: vis.length > 3 ? `Ver las ${vis.length}` : 'Ver todas', linkAct: 'gotoPj', linkData: 'data-v="tips"' });
   },
 };
 function cardSummary(a, detailed = false) {
@@ -2673,9 +3031,9 @@ function goalCard(g) {
 
 /* ---------- PROYECCIÓN ---------- */
 VIEWS.proj = function () {
-  const tabs = [['charts', 'Gráficas'], ['savings', 'Ahorro'], ['date', 'Simulador']];
-  let h = `<div class="seg" role="tablist">${tabs.map(([v, l]) => `<button type="button" role="tab" data-act="setPj" data-v="${v}" aria-pressed="${UI.pj === v}" aria-selected="${UI.pj === v}">${l}</button>`).join('')}</div>`;
-  h += ({ charts: projCharts, savings: projSavings, date: projDate })[UI.pj]();
+  const tabs = [['charts', 'Gráficas'], ['savings', 'Ahorro'], ['date', 'Simulador'], ['tips', 'Consejos']];
+  let h = `<div class="seg tight" role="tablist">${tabs.map(([v, l]) => `<button type="button" role="tab" data-act="setPj" data-v="${v}" aria-pressed="${UI.pj === v}" aria-selected="${UI.pj === v}">${l}</button>`).join('')}</div>`;
+  h += ({ charts: projCharts, savings: projSavings, date: projDate, tips: projTips })[UI.pj]();
   return h;
 };
 function projSavings() {
@@ -2829,7 +3187,8 @@ function sdPresets() {
 function delta(v) { return `<span class="small ${v > 0.5 ? 'in' : v < -0.5 ? 'out' : 'muted'} num">${v > 0.5 ? '+' : ''}${esc(money(v, { decimals: 0 }))}</span>`; }
 function projDate() {
   const t = D.today(); const sd = UI.sd; if (!D.valid(sd.date) || sd.date <= t) sd.date = D.addMonths(t, 3);
-  const r = simulateTo(sd.date, { applySavings: sd.savings, payCards: sd.cards, extras: sd.extras });
+  const base = simBase();
+  const r = simulateTo(sd.date, base);
   const days = D.diff(t, sd.date);
   let h = `<section class="panel"><div class="panel-h"><h2>¿Cuánto tendré el…?</h2></div>
     <label class="field" style="margin-bottom:.625rem"><span class="sr">Fecha</span><input class="input" type="date" id="sd-date" value="${sd.date}" min="${D.add(t, 1)}"></label>
@@ -2842,6 +3201,7 @@ function projDate() {
     </div>
     ${r.hasVouchers ? `<div class="kv mt-s"><span>Vales de despensa</span><span>${esc(money(r.vouchers1, { decimals: 0 }))}</span></div>` : ''}
     ${r.debt0 || r.debt1 ? `<div class="kv mt-s"><span>Deuda en tarjetas</span><span>${esc(money(r.debt1, { decimals: 0 }))}</span></div>` : ''}
+    ${r.other0 ? `<div class="kv"><span>Otras deudas</span><span>${esc(money(r.other1, { decimals: 0 }))}</span></div>` : ''}
     ${lineChart('ch-sd', [
     { name: 'Patrimonio', color: 'var(--c-3)', points: r.points.map((x) => ({ date: x.date, y: x.net })) },
     { name: 'Disponible', color: 'var(--c-1)', fill: true, points: r.points.map((x) => ({ date: x.date, y: x.liquid })) },
@@ -2851,28 +3211,124 @@ function projDate() {
     : insight(`Tu punto más bajo en ese lapso: <b class="num">${esc(money(r.low.value, { decimals: 0 }))}</b> el ${esc(fmtDate(r.low.date, 'long'))}.`)}
     ${dataTable(['Fecha', 'Disponible', 'Patrimonio'], r.points.filter((_, i) => i % Math.max(1, Math.round(r.points.length / 12)) === 0 || i === r.points.length - 1).map((x) => [fmtDate(x.date, 'full'), money(x.liquid, { decimals: 0 }), money(x.net, { decimals: 0 })]))}
   </section>`;
+  h += debtsPanel(base);
   h += panel('De hoy a esa fecha', `
     <div class="kv"><span>Ingresos</span><span class="in">+${esc(money(r.inc, { decimals: 0 }))}</span></div>
     <div class="kv"><span>Gastos</span><span>−${esc(money(r.exp, { decimals: 0 }))}</span></div>
     ${sd.savings ? `<div class="kv"><span>Apartado para metas</span><span>${esc(money(r.saved, { decimals: 0 }))}</span></div>` : ''}
-    ${sd.cards && r.cardPaid ? `<div class="kv"><span>Pagos de tarjetas</span><span>${esc(money(r.cardPaid, { decimals: 0 }))}</span></div>` : ''}
+    ${r.cardPaid ? `<div class="kv"><span>Pagos de tarjetas</span><span>${esc(money(r.cardPaid, { decimals: 0 }))}</span></div>` : ''}
+    ${r.debtPaid ? `<div class="kv"><span>Pagos de otras deudas</span><span>${esc(money(r.debtPaid, { decimals: 0 }))}</span></div>` : ''}
     ${r.interest > 0.5 ? `<div class="kv"><span>Rendimientos</span><span class="in">+${esc(money(r.interest, { decimals: 0 }))}</span></div>` : ''}
     ${r.topExpenses.length ? `<div class="label mt-s">Gastos más grandes</div><div class="list">${r.topExpenses.map((x) => `<div class="item" style="min-height:48px"><span class="ico sm" style="${tint(catColor(x.cat))}" aria-hidden="true">${catIcon(x.cat)}</span><span class="item-main"><span class="item-title">${esc(x.name)}</span><span class="item-sub">${x.n === 1 ? '1 vez' : x.n + ' veces'}</span></span><span class="amt">${esc(money(x.total, { decimals: 0 }))}</span></div>`).join('')}</div>` : ''}`);
   h += panel('Tus cuentas ese día', `<div class="list">${r.accounts.map((x) => { const cr = x.acc.type === 'credit'; return `<div class="item" style="min-height:52px"><span class="ico sm" aria-hidden="true">${accIcon(x.acc)}</span><span class="item-main"><span class="item-title">${esc(x.acc.name)}</span><span class="item-sub">Hoy ${esc(cr ? money(Math.max(0, -x.start), { decimals: 0 }) + ' de deuda' : money(x.start, { decimals: 0 }))}</span></span><span class="item-end"><span class="amt">${esc(cr ? money(Math.max(0, -x.end), { decimals: 0 }) : money(x.end, { decimals: 0 }))}</span>${cr ? '<span class="muted tiny">deuda</span>' : delta(x.end - x.start)}</span></div>`; }).join('') || '<div class="muted">Sin cuentas.</div>'}</div>`);
   if (r.goals.length) h += panel('Tus metas ese día', r.goals.map((g) => { const pct = g.target ? Math.min(100, (g.value / g.target) * 100) : 0; return `<div class="mt-s"><div class="row between" style="align-items:baseline"><span class="grow row" style="gap:.375rem"><span class="i" aria-hidden="true" style="color:color-mix(in srgb,${g.color} 70%,var(--ink))">${glyph(g.icon, 'target')}</span>${esc(g.name)}</span><span class="tiny num nowrap">${esc(money(g.value, { decimals: 0 }))} / ${esc(money(g.target, { decimals: 0 }))}</span></div>${progressBar(pct, g.color || 'var(--primary)')}<div class="item-sub">${g.reached ? (g.start >= g.target ? 'Ya está lograda' : 'La alcanzas el ' + esc(fmtDate(g.reached, 'long'))) : `${Math.round(pct)}%, faltarían ${esc(money(Math.max(0, g.target - g.value), { decimals: 0 }))}`}</div></div>`; }).join(''));
   h += panel('Supuestos', `${switchHTML('Aplicar mi regla de ahorro', { act: 'sdToggle', name: 'savings', checked: sd.savings, sub: savingsPlan(periodOf(t)).text })}
-    ${switchHTML('Pagar tarjetas completas en su fecha límite', { act: 'sdToggle', name: 'cards', checked: sd.cards, sub: 'Si lo apagas, la deuda se acumula' })}
-    <div class="label">Ingresos variables</div>${segHTML('vm', [['min', 'Mínimo'], ['avg', 'Promedio'], ['max', 'Máximo']], S.settings.projection.variableMode, 'data-act="setVarMode" data-x')}`);
-  const accs = activeAccounts();
+    <div class="label">Ingresos variables</div>${segHTML('vm', [['min', 'Mínimo'], ['avg', 'Promedio'], ['max', 'Máximo']], S.settings.projection.variableMode, 'data-act="setVarMode" data-x')}
+    <p class="muted small">Las tarjetas se pagan como elijas en "Deudas y cómo pagarlas".</p>`);
+  const accs = activeAccounts(); const extras = S.sim.extras;
   h += panel('¿Y si…? Agrega un gasto o ingreso extra', `
     <p class="lead-q" style="margin-top:0">Prueba compras o ingresos que aún no tienes registrados. No se guardan en tus movimientos.</p>
-    ${sd.extras.length ? `<div class="list mb">${sd.extras.map((x, i) => `<div class="item" style="min-height:52px"><span class="item-main"><span class="item-title">${esc(x.name)}</span><span class="item-sub">${esc(fmtDate(x.date, 'long'))}${x.accountId ? ', ' + esc(accName(x.accountId)) : ''}</span></span><span class="amt ${x.kind === 'income' ? 'in' : ''}">${x.kind === 'income' ? '+' : '−'}${esc(money(x.amount, { decimals: 0 }))}</span><button type="button" class="icon-btn" data-act="sdDelExtra" data-i="${i}" aria-label="Quitar ${esc(x.name)}">${IC.close}</button></div>`).join('')}</div>` : ''}
+    ${extras.length ? `<div class="list mb">${extras.map((x, i) => `<div class="item ${x.date < t ? 'dim' : ''}" style="min-height:52px"><span class="item-main"><span class="item-title">${esc(x.name)}</span><span class="item-sub">${x.date < t ? 'Ya pasó, ' : ''}${esc(fmtDate(x.date, 'long'))}${x.accountId ? ', ' + esc(accName(x.accountId)) : ''}</span></span><span class="amt ${x.kind === 'income' ? 'in' : ''}">${x.kind === 'income' ? '+' : '−'}${esc(money(x.amount, { decimals: 0 }))}</span><button type="button" class="icon-btn" data-act="sdDelExtra" data-i="${i}" aria-label="Quitar ${esc(x.name)}">${IC.close}</button></div>`).join('')}</div>` : ''}
     <div class="seg" role="group" aria-label="Tipo">${[['expense', 'Gasto'], ['income', 'Ingreso']].map(([v, l]) => `<button type="button" data-act="sdKind" data-v="${v}" aria-pressed="${(UI.sdKind || 'expense') === v}">${l}</button>`).join('')}</div>
     <div class="grid2"><label class="field"><span>Monto</span><input class="input num-in" id="sd-x-amt" inputmode="decimal" placeholder="0"></label><label class="field"><span>Fecha</span><input class="input" type="date" id="sd-x-date" value="${D.add(t, 15) < sd.date ? D.add(t, 15) : sd.date}" min="${t}" max="${sd.date}"></label></div>
     <label class="field"><span>Descripción</span><input class="input" id="sd-x-name" placeholder="Ej. Laptop nueva" autocomplete="off"></label>
     ${accs.length ? `<label class="field"><span>Cuenta</span><select class="input" id="sd-x-acc">${accountOptions(defaultAccountId('expense'))}</select></label>` : ''}
     <button type="button" class="btn block" data-act="sdAddExtra">${IC.plus} Agregar a la simulación</button>`);
   return h;
+}
+
+/* ---------- Deudas en el simulador ---------- */
+/** Opciones del simulador guardadas: regla de ahorro, extras, deudas y forma de pago de cada tarjeta */
+function simBase() {
+  const t = D.today();
+  return { applySavings: UI.sd.savings, extras: S.sim.extras.filter((x) => x.date >= t), debts: activeSimDebts(), cardPlan: S.sim.cardPlan };
+}
+const cardPlanOf = (id) => S.sim.cardPlan[id] || 'due';
+function planChips(act, id, cur, withNone) {
+  return `<div class="chips plan-chips" role="group" aria-label="¿Cuándo pagas?">${Object.entries(CONFIG.debtPlans).filter(([k]) => withNone || k !== 'none')
+    .map(([k, p]) => `<button type="button" class="chip sm" data-act="${act}" data-id="${id}" data-v="${k}" aria-pressed="${cur === k}">${esc(p.chip)}</button>`).join('')}</div>`;
+}
+/** Texto y montos de cómo queda el pago de una deuda (o de un corte de tarjeta) */
+function planLine(plan, pays, due, amount, paydays) {
+  const t = D.today();
+  if (plan === 'none') return `<p class="plan-note">No se paga en la simulación: la deuda sigue y en una tarjeta genera intereses.</p>`;
+  if (!(amount > 0.004)) return `<p class="plan-note">No hay saldo por pagar.</p>`;
+  if (!pays.length) return `<p class="plan-note">Sin pagos dentro de la simulación.</p>`;
+  const inWin = paydays.filter((d) => d >= t && d <= due).length;
+  let lead;
+  if (due < t) lead = 'Ya venció: se paga en cuanto se pueda.';
+  else if (plan === 'split') lead = pays.length > 1 ? `En ${pays.length} pagos, uno por cobro:` : inWin ? 'Antes de la fecha límite solo cae un cobro:' : 'No cobras antes de la fecha límite; se paga ese día:';
+  else if (plan === 'asap') lead = pays[0].d === due && !paydays.includes(due) ? 'No cobras antes de la fecha límite; se paga ese día:' : 'Todo con tu próximo cobro:';
+  else lead = 'Todo el último día:';
+  return `<p class="plan-note">${esc(lead)}</p><div class="pay-pills">${pays.map((p) => `<span class="pay-pill"><span>${esc(fmtDate(p.d))}</span><b>${esc(money(p.amt, { decimals: p.amt % 1 ? 2 : 0 }))}</b></span>`).join('')}</div>`;
+}
+function debtsPanel(base) {
+  const t = D.today(); const cards = activeAccounts().filter((a) => a.type === 'credit'); const all = S.sim.debts;
+  // hasta dónde simular para ver todos los pagos: la fecha límite más lejana
+  let end = D.add(t, 1); let any = false;
+  for (const x of base.debts) { end = D.max(end, x.due); any = true; }
+  const cinfo = {};
+  for (const a of cards) {
+    const c = cardInfo(a); cinfo[a.id] = c;
+    if (cardPlanOf(a.id) !== 'none' && (c.pendingLast > 0 || c.nextStatement > 0 || c.debt > 0)) { end = D.max(end, c.dueNext); any = true; }
+  }
+  end = D.min(end, D.add(t, 400));
+  const cur = simulateTo(end, base);
+  let h = `<section class="panel" id="sd-debts"><div class="panel-h"><h2>Deudas y cómo pagarlas</h2></div>
+    <p class="lead-q" style="margin-top:0">Elige si pagas cada deuda completa con tu próximo cobro, dividida entre los cobros que caen antes de su fecha límite o toda el último día.</p>`;
+  for (const a of cards) {
+    const c = cinfo[a.id]; const plan = cardPlanOf(a.id);
+    const groups = [];
+    if (c.pendingLast > 0) groups.push({ title: `Corte del ${fmtDate(c.lastCut)}`, amount: c.pendingLast, due: c.dueLast, est: false });
+    groups.push({ title: `Próximo corte, ${fmtDate(c.nextCut)}${c.nextStatement > 0 ? ' (aprox.)' : ''}`, amount: c.nextStatement, due: c.dueNext, est: true });
+    h += `<div class="debt-item"><div class="debt-head"><span class="ico sm" aria-hidden="true">${IC.card}</span><span class="item-main"><span class="item-title">${esc(a.name)}</span><span class="item-sub">Tarjeta de crédito, debes ${esc(money(c.debt, { decimals: 0 }))}</span></span></div>
+      ${planChips('sdCardPlan', a.id, plan, true)}
+      ${groups.map((g) => `<div class="debt-cycle"><div class="kv"><span>${esc(g.title)}</span><span>${esc(money(g.amount, { decimals: 0 }))}</span></div><div class="muted tiny">Fecha límite: ${esc(g.due < t ? 'venció el ' + fmtDate(g.due, 'long') : fmtDate(g.due, 'long'))}</div>
+        ${planLine(plan, cur.pays.filter((p) => p.ref === a.id && p.due === g.due), g.due, g.amount, cur.paydays)}</div>`).join('')}
+    </div>`;
+  }
+  for (const x of all) {
+    const gone = !(D.valid(x.due) && x.due >= t);
+    h += `<div class="debt-item ${gone ? 'dim' : ''}"><div class="debt-head"><span class="ico sm" aria-hidden="true">${ico('receipt')}</span><button type="button" class="item-main debt-edit" data-act="sdEditDebt" data-id="${x.id}"><span class="item-title">${esc(x.name)}</span><span class="item-sub">${esc(money(x.amount, { decimals: 0 }))}, ${gone ? 'venció el ' : 'límite '}${esc(fmtDate(x.due, 'day'))}${x.accountId && findAcc(x.accountId) ? ', de ' + esc(findAcc(x.accountId).name) : ''}</span></button><button type="button" class="icon-btn" data-act="sdDelDebt" data-id="${x.id}" aria-label="Quitar ${esc(x.name)}">${IC.close}</button></div>
+      ${gone ? '<p class="plan-note">Su fecha límite ya pasó; no entra en la simulación.</p>' : planChips('sdDebtPlan', x.id, x.plan || 'split', false) + planLine(x.plan || 'split', cur.pays.filter((p) => p.ref === x.id), x.due, +x.amount, cur.paydays)}
+    </div>`;
+  }
+  if (!cards.length && !all.length) h += `<p class="muted small">Aún no tienes tarjetas ni deudas en la simulación.</p>`;
+  h += `<button type="button" class="btn ghost block mt-s" data-act="sdNewDebt">${IC.plus} Agregar una deuda</button>
+    <p class="muted small mt-s">Por ejemplo, un préstamo o un pago con fecha límite. Las deudas que agregues aquí solo se usan en el simulador; no cambian tus movimientos ni tus saldos.</p></section>`;
+  if (any) h += debtCompareHTML(end, base);
+  return h;
+}
+/** ¿Conviene dividir? Compara las tres formas de pago con todas las deudas a la vez */
+function debtCompareHTML(end, base) {
+  const t = D.today(); const cmp = debtCompare(end, base); const [A, Sp, Du] = cmp;
+  if (!A.r.pays.length && !Sp.r.pays.length && !Du.r.pays.length) return '';
+  const P = CONFIG.debtPlans; const m0 = (v) => money(v, { decimals: 0 });
+  const series = [
+    { name: P.asap.label, color: 'var(--c-2)', dashed: true, points: A.r.points.map((x) => ({ date: x.date, y: x.liquid })) },
+    { name: P.split.label, color: 'var(--c-1)', points: Sp.r.points.map((x) => ({ date: x.date, y: x.liquid })) },
+  ];
+  // el cobro donde más cambia lo que te queda
+  let best = null;
+  Sp.atPay.forEach((x, i) => { const a = A.atPay[i]; if (x.liquid == null || !a || a.liquid == null) return; const d = x.liquid - a.liquid; if (!best || d > best.d) best = { d, date: x.d, sp: x.liquid, as: a.liquid }; });
+  const same = Math.abs(Sp.low.value - A.low.value) < 1 && (!best || best.d < 1);
+  let txt;
+  if (!Sp.r.paydays.length) txt = 'No tienes cobros registrados antes de tus fechas límite, así que todo se paga el último día. Registra tus ingresos para poder dividir.';
+  else if (A.firstNeg && !Sp.firstNeg) txt = `Pagando todo con el primer cobro quedarías en negativo el ${esc(fmtDate(A.firstNeg, 'long'))}. Dividido entre cobros, no.`;
+  else if (same) txt = 'Antes de tus fechas límite solo cae un cobro, así que dividir da lo mismo que pagar con tu próximo cobro.';
+  else txt = `Si lo divides, tu punto más bajo sube de <b class="num">${esc(m0(A.low.value))}</b> a <b class="num">${esc(m0(Sp.low.value))}</b>.${best && best.d >= 1 ? ` Después de tu cobro del ${esc(fmtDate(best.date, 'long'))} te quedarían ${esc(m0(best.sp))} en vez de ${esc(m0(best.as))}.` : ''}`;
+  const rows = Sp.atPay.slice(0, 8).map((x, i) => [fmtDate(x.d), ...cmp.map((c) => c.atPay[i] && c.atPay[i].liquid != null ? c.atPay[i].liquid : null)]);
+  const cell = (v) => (v == null ? '<td>—</td>' : `<td class="${v < 0 ? 'out' : ''}">${esc(m0(v))}</td>`);
+  return `<section class="panel"><div class="panel-h"><h2>¿Conviene dividir?</h2><span class="sub">hasta el ${esc(fmtDate(end))}</span></div>
+    <p class="lead-q" style="margin-top:0">Tu disponible pagando todas tus deudas de la misma forma.</p>
+    ${lineChart('ch-debt', series, { height: 190, label: 'Disponible pagando todo junto contra dividido entre cobros', xFmt: 'short' })}
+    <div class="legend">${series.map((s) => `<span><i class="${s.dashed ? 'dash' : ''}" style="background:${s.color};color:${s.color}"></i>${esc(s.name)}</span>`).join('')}</div>
+    ${insight(txt, A.firstNeg && !Sp.firstNeg ? 'alert' : 'bulb')}
+    <div class="table-wrap mt-s"><table class="data cmp"><caption class="sr">Disponible al cierre de cada día de cobro</caption><thead><tr><th scope="col">Tras el cobro</th>${cmp.map((c) => `<th scope="col">${esc(P[c.plan].col)}</th>`).join('')}</tr></thead>
+      <tbody>${rows.map((r) => `<tr><td>${esc(r[0])}</td>${r.slice(1).map(cell).join('')}</tr>`).join('')}
+      <tr class="low"><td>Punto más bajo</td>${cmp.map((c) => cell(c.low.value)).join('')}</tr></tbody></table></div>
+    <p class="muted small mt-s">Pagar todo el último día deja el dinero más tiempo en tu cuenta, pero solo conviene si no lo gastas antes. Pagar la tarjeta completa antes de su fecha límite evita intereses.</p>
+  </section>`;
 }
 
 function nearestY(points, date) { let best = points[0]; for (const p of points) if (p.date <= date) best = p; return best.saved; }
@@ -2909,6 +3365,37 @@ function simulatorHTML(base) {
     h += `<div class="label mt">Escenarios guardados</div><div class="list">${S.scenarios.map((s) => `<div class="item"><span class="item-main"><span class="item-title">${esc(s.name)}</span><span class="item-sub">${s.changes.length} ${s.changes.length === 1 ? 'cambio' : 'cambios'}</span></span><button type="button" class="btn sm ghost" data-act="simLoad" data-id="${s.id}">Cargar</button><button type="button" class="icon-btn" data-act="simDelSaved" data-id="${s.id}" aria-label="Eliminar escenario">${IC.trash}</button></div>`).join('')}</div>`;
   }
   return h + '</section>';
+}
+
+/* ---------- Recomendaciones ---------- */
+const TIP_LEVEL = { bad: 'Atiende ya', warn: 'Conviene mejorar', info: 'Idea', good: 'Vas bien' };
+function tipButton(x, cls = 'btn sm') {
+  if (!x.act) return '';
+  return `<button type="button" class="${cls}" data-act="${x.act}" data-id="${esc(x.arg || '')}" data-v="${esc(x.arg || '')}" data-dir="1">${esc(x.actLabel || 'Ver')}</button>`;
+}
+function tipCard(x) {
+  return `<article class="tip ${x.level}">
+    <div class="tip-top"><span class="tip-ico" aria-hidden="true">${ico(x.icon)}</span><h3><span class="sr">${TIP_LEVEL[x.level]}: </span>${esc(x.title)}</h3></div>
+    <p>${esc(x.text)}</p>
+    ${x.level !== 'good' ? `<div class="tip-actions">${tipButton(x)}<button type="button" class="btn sm ghost" data-act="tipHide" data-id="${esc(x.id)}">Ocultar</button></div>` : ''}
+  </article>`;
+}
+function projTips() {
+  const all = recommendations();
+  if (!all.length) return `<div class="panel">${emptyBox('bulb', 'Cuando registres tus ingresos y gastos, aquí verás recomendaciones con tus números.', `<button type="button" class="btn" data-act="startWizard">Configurar mi app</button>`)}</div>`;
+  const hid = hiddenTipIds(); const vis = all.filter((x) => !hid.has(x.id)); const k = healthKpis();
+  const n = (lv) => vis.filter((x) => x.level === lv).length;
+  const counts = [['bad', 'urgentes'], ['warn', 'por mejorar'], ['info', 'ideas'], ['good', 'van bien']].filter(([lv]) => n(lv)).map(([lv, l]) => `<span class="tip-count ${lv}"><b>${n(lv)}</b> ${l}</span>`).join('');
+  let h = `<section class="panel"><div class="panel-h"><h2>Recomendaciones</h2></div>
+    <p class="lead-q" style="margin-top:0">Con base en tus ingresos, gastos, tarjetas y metas${k.basis ? ` (${esc(k.basis)})` : ''}. Cambian solas cada vez que registras algo.</p>
+    <div class="tip-counts">${counts}</div></section>`;
+  for (const [lv, title] of [['bad', 'Atiende primero'], ['warn', 'Conviene mejorar'], ['info', 'Ideas para ti'], ['good', 'Lo que vas haciendo bien']]) {
+    const xs = vis.filter((x) => x.level === lv); if (!xs.length) continue;
+    h += `<h2 class="tips-group">${title}</h2>${xs.map(tipCard).join('')}`;
+  }
+  if (hid.size) h += `<button type="button" class="btn outline block mt" data-act="tipsShowHidden">Mostrar ${hid.size === 1 ? 'la recomendación oculta' : `las ${hid.size} ocultas`}</button>`;
+  h += `<p class="muted small mt">Son sugerencias automáticas a partir de lo que registras en la app; no sustituyen la asesoría de un profesional en finanzas.</p>`;
+  return h;
 }
 
 /* ---------- AJUSTES ---------- */
@@ -3381,8 +3868,8 @@ function openCategoryForm(cat = null, { kind = 'expense', onSaved, parentId = nu
 }
 
 /* ---------- Metas ---------- */
-function openGoalForm(goal = null, { onSaved } = {}) {
-  const d = goal ? clone(goal) : { name: '', icon: 'target', color: CONFIG.palette[S.goals.length % CONFIG.palette.length], target: null, initial: null, deadline: '', priority: S.goals.length + 1 > 5 ? 3 : S.goals.length + 1, percent: '', rate: '', accountId: null };
+function openGoalForm(goal = null, { onSaved, preset } = {}) {
+  const d = goal ? clone(goal) : Object.assign({ name: '', icon: 'target', color: CONFIG.palette[S.goals.length % CONFIG.palette.length], target: null, initial: null, deadline: '', priority: S.goals.length + 1 > 5 ? 3 : S.goals.length + 1, percent: '', rate: '', accountId: null }, preset || {});
   const sh = openSheet({ title: goal ? 'Editar meta' : 'Nueva meta', tall: true, foot: `${goal ? `<button type="button" class="btn danger" data-del>${IC.trash}</button>` : '<button type="button" class="btn ghost" data-close>Cancelar</button>'}<button type="button" class="btn" data-save>Guardar</button>` });
   const savAcc = activeAccounts().filter((a) => a.type === 'savings' || a.type === 'debit');
   sh.setBody(`<div class="row"><span class="ico" data-preview-icon style="${tint(d.color)}" aria-hidden="true">${glyph(d.icon, 'target')}</span><input class="input" name="name" value="${esc(d.name)}" placeholder="Ej. Fondo de emergencia" aria-label="Nombre de la meta"></div>
@@ -3541,6 +4028,42 @@ function simSavingsForm() {
     UI.sim.changes = UI.sim.changes.filter((c) => c.type !== 'savings');
     UI.sim.changes.push({ type: 'savings', savings: { type, fixed: cur.fixed, percent: cur.percent } }); sh.close(); render();
   };
+}
+
+/** Deuda para el simulador: monto, fecha límite, cuenta de la que sale y cómo pagarla */
+function openDebtForm(debt = null) {
+  const t = D.today(); const liquid = activeAccounts().filter(isLiquidAcc);
+  const d = debt ? clone(debt) : { name: '', amount: null, due: D.add(t, 30), accountId: (liquid.find((a) => a.type === 'debit') || liquid[0] || {}).id || null, plan: 'split' };
+  let plan = d.plan || 'split';
+  const sh = openSheet({ title: debt ? 'Editar deuda' : 'Agregar deuda', tall: true, foot: `${debt ? `<button type="button" class="btn danger" data-del aria-label="Quitar deuda">${IC.trash}</button>` : '<button type="button" class="btn ghost" data-close>Cancelar</button>'}<button type="button" class="btn" data-save>Guardar</button>` });
+  const pd = () => paydayDates(t, D.add(t, 400));
+  const hint = () => {
+    const v = readFields(sh.body); const due = D.valid(v.due) ? v.due : null; if (!due) return '';
+    const n = pd().filter((x) => x <= due).length;
+    return n ? `Antes de esa fecha cobras ${n === 1 ? '1 vez' : n + ' veces'}.` : 'No cobras antes de esa fecha.';
+  };
+  sh.setBody(`<div class="field"><span>¿Cuánto debes?</span>${moneyInput('amount', d.amount, { big: true })}</div>
+    <label class="field"><span>¿A quién o de qué?</span><input class="input" name="name" value="${esc(d.name)}" placeholder="Ej. Préstamo de mi hermano" autocomplete="off"></label>
+    <label class="field"><span>Fecha límite para pagarla</span><input class="input" type="date" name="due" value="${esc(d.due)}" min="${t}"><span class="hint" data-hint>${esc('')}</span></label>
+    ${liquid.length ? `<label class="field"><span>¿De qué cuenta la pagas?</span><select class="input" name="accountId">${accountOptions(d.accountId, { filter: isLiquidAcc })}</select></label>` : ''}
+    <div class="field"><span>¿Cómo la quieres pagar?</span>${segHTML('plan', [['asap', 'Próximo cobro'], ['split', 'Dividir'], ['due', 'Fecha límite']], plan)}</div>
+    <p class="muted small" data-plan-hint></p>`);
+  const PH = { asap: 'Se paga completa con tu primer cobro.', split: 'Se divide en partes iguales entre los cobros que caen antes de la fecha límite.', due: 'Se paga completa el último día.' };
+  const upd = () => { const h1 = $('[data-hint]', sh.body); if (h1) h1.textContent = hint(); const h2 = $('[data-plan-hint]', sh.body); if (h2) h2.textContent = PH[plan]; };
+  upd();
+  sh.body.addEventListener('change', upd);
+  sh.body.addEventListener('click', (e) => { const b = e.target.closest('[data-seg="plan"]'); if (!b) return; plan = b.dataset.v; $$('[data-seg="plan"]', sh.body).forEach((x) => x.setAttribute('aria-pressed', x === b)); upd(); });
+  $('[data-save]', sh.el).onclick = () => {
+    const v = readFields(sh.body); const amount = parseAmount(v.amount);
+    if (!(amount > 0)) return toast('Escribe cuánto debes.', 'error');
+    if (!D.valid(v.due) || v.due < t) return toast('Elige una fecha límite de hoy en adelante.', 'error');
+    const data = { name: (v.name || '').trim() || 'Deuda', amount, due: v.due, accountId: v.accountId || null, plan };
+    if (debt) Object.assign(debt, data); else S.sim.debts.push(Object.assign({ id: uid(), created: t }, data));
+    if (D.valid(UI.sd.date) && UI.sd.date < v.due) UI.sd.date = v.due;   // que la simulación llegue a la fecha límite
+    save(); sh.close(); render(); toast(debt ? 'Deuda actualizada.' : 'Deuda agregada a la simulación.', 'ok');
+  };
+  const del = $('[data-del]', sh.el);
+  if (del) del.onclick = () => { S.sim.debts = S.sim.debts.filter((y) => y.id !== debt.id); save(); sh.close(); render(); };
 }
 
 /* ---------- Secciones de Ajustes ---------- */
@@ -3818,18 +4341,34 @@ Object.assign(ACT, {
   setHorizon: (d) => { const pr = S.settings.projection; if (d.m === 'date') { pr.horizonType = 'date'; if (!D.valid(pr.endDate) || pr.endDate <= D.today()) pr.endDate = D.addMonths(D.today(), 36); } else { pr.horizonType = 'months'; pr.months = +d.m; } save(); render(); },
   setVarMode: (d) => { S.settings.projection.variableMode = d.v; save(); render(); },
   setPj: (d) => { UI.pj = d.v; render(); },
+  gotoPj: (d) => { closeAllSheets(); UI.tab = 'proj'; UI.pj = d.v; render(); },
+  gotoSim: (d) => {
+    closeAllSheets(); UI.tab = 'proj'; UI.pj = 'date';
+    if (D.valid(d.id) && d.id > D.today()) UI.sd.date = d.id;
+    render();
+    if (!d.id) requestAnimationFrame(() => { const el = $('#sd-debts'); if (el) el.scrollIntoView({ block: 'start', behavior: 'smooth' }); });
+  },
+  gotoRules: () => { closeAllSheets(); UI.tab = 'moves'; UI.mv = 'rules'; render(); },
+  tipHide: (d) => { S.meta.tipsHidden[d.id] = D.today(); save(); render(); toast(`Listo, no la verás por ${CONFIG.tips.hideDays} días.`, 'ok'); },
+  tipsShowHidden: () => { S.meta.tipsHidden = {}; save(); render(); },
+  newEmergencyGoal: (d) => openGoalForm(null, { preset: { name: 'Fondo de emergencia', icon: 'shield', target: +d.id || null, priority: 1 } }),
   sdPreset: (d) => { UI.sd.date = d.d; render(); },
   sdToggle: (d, el) => { UI.sd[el.name] = el.checked; render(); },
+  sdCardPlan: (d) => { S.sim.cardPlan[d.id] = d.v; save(); render(); },
+  sdDebtPlan: (d) => { const x = S.sim.debts.find((y) => y.id === d.id); if (x) { x.plan = d.v; save(); render(); } },
+  sdNewDebt: () => openDebtForm(),
+  sdEditDebt: (d) => { const x = S.sim.debts.find((y) => y.id === d.id); if (x) openDebtForm(x); },
+  sdDelDebt: (d) => { S.sim.debts = S.sim.debts.filter((y) => y.id !== d.id); save(); render(); },
   sdKind: (d) => { UI.sdKind = d.v; $$('[data-act="sdKind"]').forEach((b) => b.setAttribute('aria-pressed', b.dataset.v === d.v)); },
   sdAddExtra: () => {
     const amt = parseAmount(($('#sd-x-amt') || {}).value); const date = ($('#sd-x-date') || {}).value;
     if (!(amt > 0)) { toast('Escribe el monto del gasto o ingreso extra.', 'error'); $('#sd-x-amt').focus(); return; }
     if (!D.valid(date) || date < D.today() || date > UI.sd.date) { toast('Elige una fecha entre hoy y la fecha de la simulación.', 'error'); return; }
     const kind = UI.sdKind || 'expense'; const name = (($('#sd-x-name') || {}).value || '').trim() || (kind === 'income' ? 'Ingreso extra' : 'Gasto extra');
-    UI.sd.extras.push({ kind, amount: amt, date, name, accountId: ($('#sd-x-acc') || {}).value || null }); render();
+    S.sim.extras.push({ kind, amount: amt, date, name, accountId: ($('#sd-x-acc') || {}).value || null }); save(); render();
     toast(`${name} agregado a la simulación.`, 'ok');
   },
-  sdDelExtra: (d) => { UI.sd.extras.splice(+d.i, 1); render(); },
+  sdDelExtra: (d) => { S.sim.extras.splice(+d.i, 1); save(); render(); },
   simAmount: () => simAmountForm(),
   simAdd: () => simAddForm(),
   simSavings: () => simSavingsForm(),
