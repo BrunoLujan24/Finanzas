@@ -230,6 +230,10 @@ textarea.input{min-height:84px;resize:vertical}
 .seg.scroll{overflow-x:auto;scrollbar-width:none}
 .seg.scroll::-webkit-scrollbar{display:none}
 .seg.scroll button{flex:1 0 auto;padding:0 .5rem;font-size:.875rem}
+.seg.tight{overflow-x:auto;scrollbar-width:none}
+.seg.tight::-webkit-scrollbar{display:none}
+.seg.tight button{flex:1 0 auto;padding:0 .5rem;font-size:.875rem}
+@media (max-width:360px){.seg.tight button{padding:0 .375rem;font-size:.8125rem}}
 .chips{display:flex;flex-wrap:wrap;gap:.5rem}
 .chips.scroll{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:0 -1rem;padding:0 1rem .25rem}
 .chips.scroll::-webkit-scrollbar{display:none}
@@ -367,6 +371,37 @@ details.data-view>summary::-webkit-details-marker{display:none}
 .legend i.box{width:12px;height:12px;border-radius:3px}
 .legend i.dash{background:repeating-linear-gradient(90deg,currentColor 0 4px,transparent 4px 7px)!important}
 .legend i.faded{opacity:.45}
+.tip{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--tc,var(--primary));border-radius:var(--r-md);padding:.875rem 1rem;margin-bottom:.75rem}
+.tip.bad{--tc:var(--st-bad)}.tip.warn{--tc:var(--st-warn)}.tip.info{--tc:var(--primary)}.tip.good{--tc:var(--st-good)}
+.tip-top{display:flex;align-items:flex-start;gap:.75rem}
+.tip-top h3{flex:1;min-width:0;padding-top:.3125rem}
+.tip-ico{display:inline-grid;place-items:center;width:32px;height:32px;border-radius:10px;background:color-mix(in srgb,var(--tc,var(--primary)) 14%,var(--surface));color:color-mix(in srgb,var(--tc,var(--primary)) 80%,var(--ink));flex:none}
+.tip-ico svg{width:18px;height:18px}
+.tip h3{margin:0;font-size:1rem;font-weight:600;line-height:1.35}
+.tip p{margin:.5rem 0 0;font-size:.9375rem;line-height:1.5;color:var(--ink)}
+.tip-actions{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.75rem}
+.plan-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin:.25rem 0 .5rem}
+.plan-tile{padding:.625rem .625rem .5rem;border-radius:var(--r-sm);background:color-mix(in srgb,var(--pc) 12%,var(--surface));border:1px solid color-mix(in srgb,var(--pc) 30%,var(--line));min-width:0}
+.plan-tile.need{--pc:var(--c-1)}.plan-tile.save{--pc:var(--c-3)}.plan-tile.fun{--pc:var(--c-2)}
+.plan-tile small{display:block;font-size:.75rem;font-weight:600;color:var(--muted)}
+.plan-tile b{display:block;font-family:var(--font-num);font-size:1.0625rem;font-weight:700;letter-spacing:-.02em;margin:.125rem 0;white-space:nowrap}
+@media (max-width:380px){.plan-tiles{gap:.375rem}.plan-tile{padding:.5rem .4375rem .4375rem}.plan-tile b{font-size:.875rem;letter-spacing:-.04em}.plan-tile small{font-size:.6875rem}}
+.plan-tile span{font-size:.75rem;color:var(--muted)}
+.plan-per{margin:.25rem 0 .5rem;font-size:.9375rem}
+.plan-bars{display:flex;flex-direction:column;gap:.5rem;margin-top:.5rem}
+.plan-bar{display:grid;grid-template-columns:4.5rem 1fr;align-items:center;gap:.5rem}
+.plan-bar-l{font-size:.8125rem;color:var(--muted);font-weight:600}
+.plan-bar .split{margin:0}
+.plan-mini{display:flex;align-items:center;gap:.625rem;width:100%;min-height:44px;padding:.5rem .75rem;margin-bottom:.5rem;border-radius:var(--r-sm);border:0;background:color-mix(in srgb,var(--c-3) 12%,var(--surface));color:var(--ink);font:inherit;font-size:.875rem;text-align:left;cursor:pointer}
+.plan-mini .i{color:color-mix(in srgb,var(--c-3) 80%,var(--ink));flex:none}
+.tips-group{font-size:.8125rem;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:1.25rem .25rem .5rem}
+.tip-counts{display:flex;flex-wrap:wrap;gap:.5rem}
+.tip-count{display:inline-flex;align-items:baseline;gap:.25rem;padding:.25rem .625rem;border-radius:8px;font-size:.8125rem;background:color-mix(in srgb,var(--tc) 12%,var(--surface));color:color-mix(in srgb,var(--tc) 80%,var(--ink))}
+.tip-count b{font-family:var(--font-num)}
+.tip-count.bad{--tc:var(--st-bad)}.tip-count.warn{--tc:var(--st-warn)}.tip-count.info{--tc:var(--primary)}.tip-count.good{--tc:var(--st-good)}
+.tip-row .item-title{white-space:normal;line-height:1.3}
+.tip-row .tip-ico.bad{--tc:var(--st-bad)}.tip-row .tip-ico.warn{--tc:var(--st-warn)}.tip-row .tip-ico.info{--tc:var(--primary)}
+.tip-row .chev{width:20px;color:var(--muted);flex:none}
 .insight{display:flex;gap:.625rem;align-items:flex-start;padding:.625rem .75rem;border-radius:var(--r-sm);background:var(--surface-2);font-size:.875rem;margin-top:.5rem}
 .insight svg{width:18px;height:18px;margin-top:2px;color:var(--primary-text)}
 
@@ -455,7 +490,7 @@ details.data-view>summary::-webkit-details-marker{display:none}
 const CONFIG = {
   app: {
     name: 'Mis Finanzas',
-    version: '1.3.1',
+    version: '1.6.0',
     storageKey: 'misFinanzas.v1',   // clave en localStorage
     schema: 1,                      // versión del formato de datos
   },
@@ -497,6 +532,7 @@ const CONFIG = {
       cards: [                      // orden y visibilidad de las tarjetas de Inicio
         { id: 'balance', visible: true },
         { id: 'forecast', visible: true },
+        { id: 'tips', visible: true },
         { id: 'period', visible: true },
         { id: 'upcoming', visible: true },
         { id: 'saved', visible: true },
@@ -526,6 +562,7 @@ const CONFIG = {
   homeCards: {
     balance: 'Saldo disponible',
     forecast: 'Saldo de los próximos 60 días',
+    tips: 'Recomendaciones',
     period: 'Ingresos vs. gastos del periodo',
     upcoming: 'Próximos pagos',
     saved: 'Total ahorrado',
@@ -585,6 +622,22 @@ const CONFIG = {
   ],
 
   dateFormats: ['DD/MM/AAAA', 'MM/DD/AAAA', 'AAAA-MM-DD', 'D mmm AAAA'],
+
+  /* Umbrales de las recomendaciones y del plan sugerido (en % o en meses) */
+  tips: {
+    savingsRate: [10, 20],   // te queda menos de 10% = atención; 20% o más = bien
+    fixedMax: 50,            // gastos fijos arriba de este % del ingreso
+    emergencyMonths: [3, 6], // fondo de emergencia recomendado, en meses de gastos
+    cardUse: 30,             // uso de la línea de crédito recomendado (máximo %)
+    smallExpense: 200,       // "gastos hormiga": gastos de este monto o menos
+    categoryRise: 25,        // % arriba de tu promedio para avisar
+    hideDays: 30,            // días que se oculta una recomendación al tocar "Ocultar"
+    // plan sugerido (guía 50/30/20 ajustada a lo que te deja lo necesario)
+    plan: { saveMin: 10, saveIdeal: 20, wantsMax: 30 },
+  },
+
+  /* Palabras con las que una categoría se considera "gusto" (si no la marcas tú) */
+  wantWords: ['restaurant', 'entreten', 'suscrip', 'ropa', 'regalo', 'viaje', 'vacacion', 'cine', 'salida', 'antojo', 'gusto', 'café', 'cafe', 'bar', 'juego', 'diversi', 'stream', 'hobby', 'bebida', 'fiesta', 'compras'],
 
   limits: {
     maxScan: 6000,         // máximo de fechas que revisa el motor por regla (protección)
@@ -772,7 +825,7 @@ function newState() {
     schema: CONFIG.app.schema, setupDone: false, startDate: t,
     settings: clone(CONFIG.defaults),
     accounts: [], categories: defaultCategories(), rules: [], goals: [], holidays: [], scenarios: [],
-    meta: { notified: {}, savingsAppliedUntil: null, holidayYears: [], reminderShown: null },
+    meta: { notified: {}, savingsAppliedUntil: null, holidayYears: [], reminderShown: null, tipsHidden: {} },
   };
 }
 /** Completa datos de versiones anteriores o importados con lo que falte */
@@ -783,9 +836,11 @@ function migrate(s) {
   // tarjetas de Inicio nuevas que no existan en datos viejos
   const ids = new Set(out.settings.home.cards.map((c) => c.id));
   CONFIG.defaults.home.cards.forEach((c, i) => { if (!ids.has(c.id)) out.settings.home.cards.splice(Math.min(i, out.settings.home.cards.length), 0, clone(c)); });
-  out.settings.home.cards = out.settings.home.cards.filter((c) => CONFIG.homeCards[c.id]);
+  const seen = new Set();   // sin tarjetas repetidas ni desconocidas
+  out.settings.home.cards = out.settings.home.cards.filter((c) => CONFIG.homeCards[c.id] && !seen.has(c.id) && seen.add(c.id));
   for (const k of ['accounts', 'categories', 'rules', 'goals', 'holidays', 'scenarios']) if (!Array.isArray(out[k])) out[k] = [];
   out.meta = Object.assign(newState().meta, s.meta || {});
+  if (!isObj(out.meta.tipsHidden)) out.meta.tipsHidden = {};
   for (const r of out.rules) { r.exc = r.exc || {}; r.pauses = r.pauses || []; r.freq = normFreq(r.freq); r.created = r.created || out.startDate; }
   for (const g of out.goals) { g.history = g.history || []; }
   // los emojis de versiones anteriores se cambian por íconos vectoriales
@@ -1664,7 +1719,7 @@ function healthKpis() {
     }
     const lim = sum(activeAccounts().filter((a) => a.type === 'credit'), (a) => +a.limit || 0);
     if (lim > 0) { const u = (tt.debt / lim) * 100; out.push({ id: 'cards', label: 'Uso de tarjetas', value: `${Math.round(u)}%`, status: st(u, 30, 60, false), note: 'de tu límite', hint: 'Usar menos de 30% del límite cuida tu historial de crédito.' }); }
-    return { list: out, inc, exp };
+    return { list: out, inc, exp, fixed, basis };
   });
 }
 /** Gasto por categoría del periodo contra presupuesto y contra el promedio de periodos anteriores */
@@ -1742,6 +1797,271 @@ function collectAlerts() {
       if (since >= +bk.remindDays && (!bk.snoozed || D.diff(bk.snoozed, t) >= 7)) out.push({ id: 'backup', level: 'info', icon: 'save', title: bk.last ? `Tu último respaldo fue hace ${daysText(since)}` : 'Aún no tienes un respaldo de tus datos', sub: 'Exporta un archivo y guárdalo fuera del celular', act: 'exportJSON' });
     }
     return out;
+  });
+}
+
+/* ---------- Recomendaciones ----------
+ * Reglas sencillas sobre tus propios datos. Cada una da un consejo con:
+ *   level: 'bad' (atender ya) · 'warn' (conviene mejorar) · 'info' (idea) · 'good' (vas bien)
+ *   title, text (con tus números), y si aplica act/arg/actLabel para un botón.
+ * Los umbrales están en CONFIG.tips. */
+function monthsText(m) {
+  if (m >= 10) return `${Math.round(m)} meses`;
+  const v = Math.round(m * 10) / 10; if (v === 1) return '1 mes';
+  return `${String(v).replace('.', S.settings.format.decimalSep)} meses`;
+}
+/** Gastos recurrentes con su equivalente mensual (próximos 12 meses / 12) */
+function recurringMonthly() {
+  return memo('recMonthly', () => {
+    const t = D.today(); const by = {};
+    for (const o of allOccurrences(t, D.add(t, 364))) {
+      if (o.kind !== 'expense' || o.status === 'skipped' || o.rule.freq.type === 'once') continue;
+      const x = (by[o.ruleId] = by[o.ruleId] || { rule: o.rule, total: 0 });
+      x.total += o.hasAmount ? o.amount : baseAmount(o.rule);
+    }
+    return Object.values(by).map((x) => ({ rule: x.rule, monthly: round2(x.total / 12) })).filter((x) => x.monthly > 0).sort((a, b) => b.monthly - a.monthly);
+  });
+}
+const catMatches = (catId, re) => [findCat(catId), findCat(topCatId(catId))].some((c) => c && re.test(c.name));
+function recommendations() {
+  return memo('tips', () => {
+    if (!S.rules.length && !S.accounts.length) return [];
+    const T = CONFIG.tips; const t = D.today(); const out = []; const add = (o) => out.push(Object.assign({ weight: 0 }, o));
+    const m0 = (v) => money(v, { decimals: 0 });
+    const k = healthKpis(); const inc = k.inc, exp = k.exp; const tt = totals(); const p = periodOf(t);
+    const cards = activeAccounts().filter((a) => a.type === 'credit');
+
+    // ¿Me alcanza? saldo negativo en los próximos 60 días
+    const fc = simulateTo(D.add(t, 60));
+    if (fc.firstNeg) add({ id: 'neg', level: 'bad', icon: 'alert', title: `Tu dinero no alcanza el ${fmtDate(fc.firstNeg, 'long')}`,
+      text: `Con tus pagos programados llegarías a ${m0(fc.low.value)} el ${fmtDate(fc.low.date, 'long')}. Mueve o reduce un gasto antes de esa fecha, pasa dinero de tu ahorro o baja el ahorro de este periodo.`,
+      act: 'gotoSim', arg: fc.low.date, actLabel: 'Revisar en el simulador', weight: -fc.low.value });
+
+    // Tarjetas: pagos vencidos y uso de la línea
+    for (const a of cards) {
+      const c = cardInfo(a);
+      if (c.overdue) add({ id: 'over-' + a.id, level: 'bad', icon: 'card', title: `Pago vencido de ${a.name}`,
+        text: `Debes ${m0(c.pendingLast)} desde el ${fmtDate(c.dueLast, 'long')}. Págalo cuanto antes: después de la fecha límite se cobran intereses y comisión, y puede afectar tu historial de crédito.`,
+        act: 'openAccount', arg: a.id, actLabel: 'Ver tarjeta', weight: c.pendingLast });
+      if (c.limit > 0 && c.used > T.cardUse) {
+        const need = round2(c.debt - (c.limit * T.cardUse) / 100);
+        add({ id: 'use-' + a.id, level: c.used > 60 ? 'warn' : 'info', icon: 'card', title: `Usas el ${Math.round(c.used)}% de tu línea en ${a.name}`,
+          text: `Lo recomendable es quedarte debajo del ${T.cardUse}%: cuida tu historial de crédito y te deja margen para emergencias. Para llegar ahí tendrías que bajar tu saldo unos ${m0(need)}.`,
+          act: 'openAccount', arg: a.id, actLabel: 'Ver tarjeta', weight: need });
+      }
+    }
+
+    // Deuda alta en tarjetas frente al ingreso
+    if (tt.debt > 0 && inc > 0 && tt.debt > inc * 0.5) add({ id: 'debt', level: tt.debt > inc ? 'warn' : 'info', icon: 'card',
+      title: tt.debt > inc ? 'Tu deuda en tarjetas es mayor que tu ingreso del mes' : 'Tu deuda en tarjetas es más de la mitad de tu ingreso',
+      text: `Debes ${m0(tt.debt)} y ganas unos ${m0(inc)} al mes. Antes de ahorrar para metas que no son urgentes, conviene liquidarla: el interés de una tarjeta suele ser mucho más alto que lo que gana cualquier ahorro. Paga el total de cada corte para no generar intereses.`,
+      act: 'gotoAccounts', actLabel: 'Ver mis tarjetas', weight: tt.debt });
+
+    // ¿Cuánto te queda de lo que ganas?
+    const sv = S.settings.savings;
+    if (inc > 0) {
+      const rate = ((inc - exp) / inc) * 100; const [r1, r2] = T.savingsRate;
+      const cc = categoryCompare(p).slice(0, 2).map((r) => r.cat.name);
+      if (rate < 0) add({ id: 'rate', level: 'bad', icon: 'trendDown', title: 'Gastas más de lo que ganas',
+        text: `En promedio salen ${m0(exp - inc)} más de lo que entra cada mes (${k.basis}).${cc.length ? ` Empieza por revisar lo que más pesa: ${listJoin(cc)}.` : ''}`,
+        act: 'gotoPj', arg: 'charts', actLabel: 'Ver mis gráficas', weight: exp - inc });
+      else if (rate < r1) add({ id: 'rate', level: 'warn', icon: 'piggy', title: `Solo te queda el ${Math.round(rate)}% de lo que ganas`,
+        text: `Intenta llegar al ${r1}% y después al ${r2}%. Para el ${r1}% tendrías que liberar unos ${m0((inc * r1) / 100 - (inc - exp))} al mes (${k.basis}).`,
+        act: 'gotoPj', arg: 'charts', actLabel: 'Ver en qué se va', weight: (inc * r1) / 100 - (inc - exp) });
+      else if (rate < r2) add({ id: 'rate', level: 'info', icon: 'piggy', title: `Te queda el ${Math.round(rate)}% de lo que ganas`,
+        text: `Vas bien. El siguiente paso es el ${r2}%: unos ${m0((inc * r2) / 100 - (inc - exp))} más al mes.`, weight: 1 });
+      else add({ id: 'rate', level: 'good', icon: 'okCircle', title: `Te queda el ${Math.round(rate)}% de lo que ganas`,
+        text: `Estás arriba de la meta común del ${r2}%. Asegúrate de que ese dinero llegue a tus metas y no se quede en la cuenta de gastos.` });
+      // ahorrar primero, no lo que sobre
+      if (sv.type === 'leftover' && rate >= 5) {
+        const pct = Math.max(5, Math.floor((rate * 0.75) / 5) * 5);
+        add({ id: 'payfirst', level: 'info', icon: 'save', title: 'Aparta tu ahorro en cuanto cobres',
+          text: `Tu regla es ahorrar lo que sobre al final, y eso casi siempre termina en menos. Con lo que te queda hoy podrías apartar el ${pct}% de cada ingreso desde el día de cobro.`,
+          act: 'openSection', arg: 'savings', actLabel: 'Cambiar mi regla', weight: 2 });
+      }
+      if ((sv.type === 'fixed' && !(+sv.fixed > 0)) || (sv.type === 'percent' && !(+sv.percent > 0))) add({ id: 'norule', level: 'info', icon: 'piggy', title: 'Define cuánto ahorrar cada periodo',
+        text: 'Tu regla de ahorro está en cero. Aunque sea poco, un monto fijo o un porcentaje de cada ingreso hace que el ahorro pase sin pensarlo.',
+        act: 'openSection', arg: 'savings', actLabel: 'Poner mi regla', weight: 3 });
+
+      // Gastos fijos
+      const fr = (k.fixed / inc) * 100;
+      if (fr > T.fixedMax) {
+        const top = recurringMonthly().filter((x) => !x.rule.variable).slice(0, 3);
+        add({ id: 'fixed', level: fr > 70 ? 'warn' : 'info', icon: 'home', title: `Tus gastos fijos se llevan el ${Math.round(fr)}% de tu ingreso`,
+          text: `Arriba del ${T.fixedMax}% queda poco margen para imprevistos.${top.length ? ` Los más grandes: ${listJoin(top.map((x) => `${x.rule.name} (${m0(x.monthly)} al mes)`))}.` : ''} Renegociar o cambiar alguno libera dinero todos los meses.`,
+          act: 'gotoRules', actLabel: 'Ver mis recurrentes', weight: k.fixed - (inc * T.fixedMax) / 100 });
+      }
+    }
+
+    // Fondo de emergencia
+    if (exp > 0) {
+      const months = tt.saved / exp; const [lo, hi] = T.emergencyMonths;
+      const eg = activeGoals().find((g) => /emergenc|imprevist|colch/i.test(g.name));
+      if (months < lo) add({ id: 'emerg', level: months < 1 ? 'warn' : 'info', icon: 'shield', title: months < 1 ? 'Arma un fondo de emergencia' : 'Sigue con tu fondo de emergencia',
+        text: `Sin contar lo que tienes en efectivo y débito, tu ahorro cubre ${monthsText(months)} de gastos. Lo recomendable es de ${lo} a ${hi} meses: entre ${m0(exp * lo)} y ${m0(exp * hi)}. ${months < 1 ? `Empieza por juntar un mes: ${m0(exp)}.` : `Te faltan ${m0(exp * lo - tt.saved)} para llegar a ${lo} meses.`}`,
+        act: eg ? 'contribute' : 'newEmergencyGoal', arg: eg ? eg.id : String(Math.round(exp * lo)), actLabel: eg ? `Abonar a "${eg.name}"` : 'Crear la meta', weight: exp * lo - tt.saved });
+      else add({ id: 'emerg', level: 'good', icon: 'shield', title: `Tu ahorro cubre ${monthsText(months)} de gastos`,
+        text: months >= hi ? `Ya pasaste los ${hi} meses recomendados. Lo que ahorres de más puede ir a otras metas o a inversiones con mejor rendimiento.` : `Está dentro de lo recomendado (${lo} a ${hi} meses).` });
+    }
+
+    // Dinero de más en efectivo y débito
+    const idle = round2(tt.liquid - exp * 1.5);
+    if (exp > 0 && idle > Math.max(1000, exp * 0.25)) {
+      const sav = activeAccounts().filter((a) => a.type === 'savings' && +a.rate > 0).sort((a, b) => b.rate - a.rate)[0];
+      let text = `Es lo que tienes en efectivo y débito por encima de mes y medio de gastos. `;
+      if (tt.debt > idle * 0.2) text += `Lo primero sería bajar tu deuda de tarjetas (${m0(tt.debt)}).`;
+      else if (sav) text += `En ${sav.name} (${sav.rate}% anual) te daría unos ${m0((idle * sav.rate) / 100)} al año.`;
+      else text += 'En una cuenta de ahorro o inversión con rendimiento trabajaría para ti, o puedes adelantar tus metas.';
+      add({ id: 'idle', level: 'info', icon: 'trendUp', title: `Tienes ${m0(idle)} que no necesitas para tus gastos`, text,
+        act: tt.debt > idle * 0.2 ? 'gotoAccounts' : activeGoals().length ? 'distribute' : 'newGoal', actLabel: tt.debt > idle * 0.2 ? 'Ver mis tarjetas' : activeGoals().length ? 'Repartir a mis metas' : 'Crear una meta', weight: idle / 20 });
+    }
+
+    // Presupuestos y categorías que suben
+    for (const b of budgetAlerts(p).filter((x) => x.level === 'over').slice(0, 3)) add({ id: 'bud-' + b.cat.id, level: 'warn', icon: b.cat.icon, title: `Te pasaste del presupuesto de ${b.cat.name}`,
+      text: `Llevas ${m0(b.spent)} de ${m0(b.budget)} y faltan ${daysText(D.diff(t, p.end) + 1)} para cerrar el periodo. Intenta no gastar más en esto hasta tu siguiente cobro, o ajusta el presupuesto si se quedó corto.`,
+      act: 'openCategory', arg: b.cat.id, actLabel: 'Ver categoría', weight: b.spent - b.budget });
+    const cc = categoryCompare(p); let rises = 0;
+    for (const r of cc) {
+      if (r.avg == null || r.avg <= 0 || rises >= 2) continue;
+      const now = r.spent + r.sched; const d = ((now - r.avg) / r.avg) * 100;
+      if (d >= T.categoryRise && now - r.avg >= Math.max(300, inc * 0.02) && !(+r.budget > 0 && r.spent > r.budget)) {
+        rises++;
+        add({ id: 'rise-' + r.cat.id, level: 'info', icon: r.cat.icon, title: `Este periodo gastas más en ${r.cat.name}`,
+          text: `${m0(now)} contra ${m0(r.avg)} de tu promedio (${Math.round(d)}% más). Si fue algo puntual, no pasa nada; si se repite, ponle un presupuesto.`,
+          act: 'openCategory', arg: r.cat.id, actLabel: 'Ver categoría', weight: now - r.avg });
+      }
+    }
+    if (!S.categories.some((c) => +c.budget > 0) && cc.length >= 2) add({ id: 'nobud', level: 'info', icon: 'tag', title: 'Ponle tope a tus gastos',
+      text: `Tus categorías con más gasto este periodo son ${listJoin(cc.slice(0, 3).map((r) => r.cat.name))}. Con un presupuesto por periodo, la app te avisa antes de pasarte.`,
+      act: 'gotoBudgets', actLabel: 'Poner presupuestos', weight: 1 });
+
+    // Suscripciones
+    const SUBS = /netflix|spotify|disney|hbo|\bmax\b|prime|youtube|apple|icloud|xbox|playstation|crunchyroll|paramount|vix|gimnasio|\bgym\b|streaming/i;
+    const subs = recurringMonthly().filter((x) => catMatches(x.rule.categoryId, /suscrip|stream/i) || SUBS.test(x.rule.name));
+    const subsM = sum(subs, (x) => x.monthly);
+    if (subs.length >= 2 || (subs.length && inc > 0 && subsM > inc * 0.03)) add({ id: 'subs', level: 'info', icon: 'tv', title: `Pagas ${m0(subsM)} al mes en suscripciones`,
+      text: `Son unos ${m0(subsM * 12)} al año entre ${listJoin(subs.slice(0, 4).map((x) => x.rule.name))}${subs.length > 4 ? ' y otras' : ''}. Revisa cuáles usaste el último mes y cancela o pausa las demás.`,
+      act: 'gotoRules', actLabel: 'Ver mis recurrentes', weight: subsM });
+
+    // Metas
+    const goals = activeGoals(); let behind = 0;
+    for (const g of goals) {
+      const gi = goalInfo(g);
+      if (gi.behind) { behind++; add({ id: 'goal-' + g.id, level: 'warn', icon: g.icon || 'target', title: `Vas atrasado en "${g.name}"`,
+        text: `Llevas ${m0(gi.saved)} y a estas alturas deberías llevar ${m0(gi.expected)}.${gi.perPeriod ? ` Para llegar el ${fmtDate(g.deadline, 'long')} necesitas ${m0(gi.perPeriod)} por ${gi.unit}.` : ''}`,
+        act: 'contribute', arg: g.id, actLabel: 'Abonar', weight: gi.expected - gi.saved }); }
+      else if (gi.overdue) add({ id: 'goalo-' + g.id, level: 'info', icon: 'calendar', title: `La fecha de "${g.name}" ya pasó`,
+        text: `Te faltan ${m0(gi.remaining)}. Ponle una fecha nueva para saber cuánto apartar en cada cobro.`, act: 'editGoal', arg: g.id, actLabel: 'Cambiar fecha', weight: 1 });
+    }
+    if (goals.some((g) => g.deadline && !goalInfo(g).reached) && !behind) add({ id: 'goalsok', level: 'good', icon: 'target', title: 'Tus metas van a tiempo', text: 'Con lo que llevas, vas al ritmo para llegar a tus fechas límite.' });
+    if (!goals.length && inc > 0) add({ id: 'nogoal', level: 'info', icon: 'target', title: 'Ponle nombre y fecha a tu ahorro',
+      text: 'Ahorrar para algo concreto (un fondo de emergencia, un viaje, un enganche) hace más fácil no gastarlo. La app te dice cuánto apartar en cada cobro.',
+      act: 'newGoal', actLabel: 'Crear una meta', weight: 1 });
+
+    // Meses apretados más adelante (después del pronóstico de 60 días)
+    const lim = D.som(D.add(t, 61));
+    const tight = monthlySeries().find((x) => x.future && x.m >= lim && x.net < 0);
+    if (tight) {
+      const mUntil = Math.max(1, D.months(D.som(t), tight.m));
+      add({ id: 'tight-' + tight.m, level: 'warn', icon: 'calendar', title: `${fmtDate(tight.m, 'month').replace(/^./, (c) => c.toUpperCase())} viene apretado`,
+        text: `Ese mes tus gastos programados (${m0(tight.exp)}) superan tus ingresos (${m0(tight.inc)}) por ${m0(-tight.net)}. Si apartas unos ${m0(-tight.net / mUntil)} al mes desde ahora, llegas sin problema.`,
+        act: 'gotoPj', arg: 'charts', actLabel: 'Ver meses', weight: -tight.net });
+    }
+
+    // Vales de despensa
+    if (tt.hasVouchers && tt.vouchers > 0) {
+      const FOOD = /s[uú]per|despensa|mandado|abarrote|comida/i;
+      const food = recurringMonthly().filter((x) => !isVoucher(x.rule.accountId) && (FOOD.test(x.rule.name) || catMatches(x.rule.categoryId, FOOD)));
+      if (food.length) add({ id: 'vales', level: 'info', icon: 'ticket', title: 'Usa tus vales para el súper',
+        text: `Tienes ${m0(tt.vouchers)} en vales y pagas ${listJoin(food.slice(0, 2).map((x) => x.rule.name))} con otra cuenta. Si lo pagas con vales, dejas hasta ${m0(Math.min(tt.vouchers, sum(food, (x) => x.monthly)))} libres en tu débito.`,
+        act: 'openRule', arg: food[0].rule.id, actLabel: `Cambiar "${food[0].rule.name}"`, weight: Math.min(tt.vouchers, food[0].monthly) });
+    }
+
+    // Gastos pequeños de los últimos 30 días
+    const small = allOccurrences(D.add(t, -30), t).filter((o) => o.kind === 'expense' && o.status === 'done' && o.amount > 0 && o.amount <= T.smallExpense && !isVoucher(o.accountId));
+    const smallSum = sum(small, (o) => o.amount);
+    if (small.length >= 8 && smallSum >= Math.max(500, inc * 0.03)) add({ id: 'small', level: 'info', icon: 'coffee', title: `Gastos pequeños: ${m0(smallSum)} en 30 días`,
+      text: `Fueron ${small.length} gastos de ${m0(T.smallExpense)} o menos. Por separado no se notan, pero a este ritmo son unos ${m0(smallSum * 12)} al año. Ponles un tope por semana.`, weight: smallSum });
+
+    // Ingresos variables
+    const vr = S.rules.filter((r) => r.kind === 'income' && r.variable && !ruleIsPaused(r) && r.min != null && r.max != null);
+    if (vr.length && S.settings.projection.variableMode !== 'min') add({ id: 'varinc', level: 'info', icon: 'scale', title: 'Planea con tu ingreso mínimo',
+      text: `${listJoin(vr.map((r) => r.name))} ${vr.length > 1 ? 'cambian' : 'cambia'} cada vez. Si haces tus cuentas con el mínimo, los meses buenos se vuelven ahorro extra en lugar de gasto.`,
+      act: 'setVarMode', arg: 'min', actLabel: 'Usar el mínimo', weight: 1 });
+
+    // Lo que vas haciendo bien
+    if (cards.length && !cards.some((a) => cardInfo(a).overdue) && !cards.some((a) => cardInfo(a).limit > 0 && cardInfo(a).used > T.cardUse))
+      add({ id: 'cardsok', level: 'good', icon: 'card', title: 'Tus tarjetas están en orden', text: `Sin pagos vencidos y usando menos del ${T.cardUse}% de tu línea.` });
+    if (S.categories.some((c) => +c.budget > 0) && !budgetAlerts(p).some((b) => b.level === 'over'))
+      add({ id: 'budok', level: 'good', icon: 'tag', title: 'Vas dentro de tus presupuestos', text: 'Ninguna categoría se ha pasado de su tope en este periodo.' });
+    if (!fc.firstNeg && fc.low.value > 0 && exp > 0 && S.accounts.length) add({ id: 'cashok', level: 'good', icon: 'okCircle', title: 'Te alcanza los próximos 60 días',
+      text: `Tu punto más bajo sería ${m0(fc.low.value)} el ${fmtDate(fc.low.date, 'long')}.` });
+
+    const ORD = { bad: 0, warn: 1, info: 2, good: 3 };
+    return out.sort((a, b) => ORD[a.level] - ORD[b.level] || b.weight - a.weight);
+  });
+}
+/** Recomendaciones que el usuario ocultó hace menos de CONFIG.tips.hideDays días */
+function hiddenTipIds() {
+  const t = D.today(); const h = S.meta.tipsHidden || {};
+  return new Set(Object.keys(h).filter((id) => D.valid(h[id]) && D.diff(h[id], t) < CONFIG.tips.hideDays));
+}
+
+/* ---------- Plan sugerido: necesario, ahorro y gustos ----------
+ * Toma tus ingresos y gastos (sin vales, que no se pueden ahorrar) de los últimos
+ * meses —o de los próximos 3 si apenas empiezas— y sugiere cuánto ahorrar y cuánto
+ * dejar para gustos con la guía 50/30/20 ajustada a lo que te deja lo necesario. */
+function wantRegex() {
+  return memo('wantRe', () => new RegExp('(?:^|[\\s/,(-])(?:' + CONFIG.wantWords.map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')', 'i'));
+}
+/** ¿Es un gusto? Lo que marcaste en la categoría; si no, se adivina por su nombre (o el de su categoría principal). */
+function catIsWant(catId) {
+  const c = findCat(catId); if (!c || c.kind !== 'expense') return false;
+  if (typeof c.want === 'boolean') return c.want;
+  const re = wantRegex(); if (re.test(c.name)) return true;
+  const p = c.parentId ? findCat(c.parentId) : null;
+  if (p && typeof p.want === 'boolean') return p.want;
+  return !!(p && re.test(p.name));
+}
+const niceAmount = (x) => { const st = x < 2000 ? 50 : 100; return Math.max(0, Math.round(x / st) * st); };
+function spendingPlan() {
+  return memo('plan', () => {
+    const t = D.today(); const cur = D.som(t); const vmode = S.settings.projection.variableMode;
+    let from = D.max(D.som(S.startDate), D.addMonths(cur, -3)); let to = D.add(cur, -1); let months = D.months(from, cur); let basis;
+    if (months < 1) { from = cur; to = D.add(D.addMonths(cur, 3), -1); months = 3; basis = 'lo que tienes programado para los próximos 3 meses'; }
+    else basis = months === 1 ? 'tu último mes' : `el promedio de tus últimos ${months} meses`;
+    let inc = 0, vin = 0, need = 0, want = 0; const wc = {}, nc = {};
+    for (const o of allOccurrences(from, to)) {
+      if (o.status === 'skipped' || (o.kind !== 'income' && o.kind !== 'expense')) continue;
+      const a = o.status === 'scheduled' && !o.hasAmount ? baseAmount(o.rule, vmode) : o.amount;
+      if (isVoucher(o.accountId)) { if (o.kind === 'income') vin += a; continue; }   // los vales van aparte
+      if (o.kind === 'income') { inc += a; continue; }
+      if (catIsWant(o.categoryId)) { want += a; const k = o.categoryId || '_none'; wc[k] = (wc[k] || 0) + a; }
+      else { need += a; const k = topCatId(o.categoryId) || '_none'; nc[k] = (nc[k] || 0) + a; }
+    }
+    const per = (x) => round2(x / months);
+    inc = per(inc); vin = per(vin); need = per(need); want = per(want);
+    const list = (o) => Object.entries(o).map(([id, a]) => ({ id, amt: per(a) })).filter((x) => x.amt > 0).sort((a, b) => b.amt - a.amt);
+    const base = { basis, months, inc, vin, need, want, wants: list(wc), needs: list(nc) };
+    if (inc <= 0) return Object.assign(base, { empty: true });
+    // reparto sugerido de lo que queda después de lo necesario
+    const P = CONFIG.tips.plan; const lo = (P.saveMin / 100) * inc, ideal = (P.saveIdeal / 100) * inc, wmax = (P.wantsMax / 100) * inc;
+    const free = round2(inc - need); let save;
+    if (free <= 0) save = 0;
+    else if (free <= 2 * lo) save = free / 2;                      // poco margen: mitad y mitad
+    else if (free >= ideal + wmax) save = free - wmax;             // mucho margen: gustos hasta 30%, el resto se ahorra
+    else save = lo + ((free - 2 * lo) / (ideal + wmax - 2 * lo)) * (ideal - lo);   // en medio: de 10% a 20%
+    save = Math.min(niceAmount(save), Math.max(0, free)); const fun = round2(Math.max(0, free - save));
+    // cobros al mes del ingreso principal (para mostrar montos por quincena)
+    const r = primaryIncome(); let perMonth = 1;
+    if (r) { const n = ruleOccurrences(r, t, D.add(t, 364), true).length; if (n >= 10) perMonth = n / 12; }
+    const unit = perMonth > 1.7 && perMonth < 2.4 ? 'quincena' : perMonth > 3.5 && perMonth < 5 ? 'semana' : perMonth >= 1.5 ? 'cobro' : null;
+    // lo que aparta hoy tu regla de ahorro, al mes
+    const sv = S.settings.savings; const left = round2(inc - need - want); let rule;
+    if (sv.type === 'percent') rule = (inc * (+sv.percent || 0)) / 100;
+    else if (sv.type === 'fixed') rule = (+sv.fixed || 0) * (S.settings.period.mode === 'payday' ? perMonth : 1);
+    else rule = Math.max(0, left);
+    return Object.assign(base, { free, save, fun, left, rule: round2(rule), perMonth, unit, rulePct: Math.round((save / inc) * 100) });
   });
 }
 
@@ -2468,6 +2788,16 @@ const HOME = {
     if (!S.accounts.length) return '';
     return forecastPanel(60, 'ch-home-fc', true);
   },
+  tips() {
+    const all = recommendations(); if (!all.length) return '';
+    const hid = hiddenTipIds(); const vis = all.filter((x) => !hid.has(x.id) && x.level !== 'good');
+    const good = all.filter((x) => x.level === 'good').length;
+    const body = vis.length ? `<div class="list">${vis.slice(0, 3).map((x) => `<button type="button" class="item tip-row" data-act="gotoPj" data-v="tips"><span class="ico sm tip-ico ${x.level}" aria-hidden="true">${ico(x.icon)}</span><span class="item-main"><span class="item-title">${esc(x.title)}</span><span class="item-sub">${TIP_LEVEL[x.level]}</span></span><span class="chev" aria-hidden="true">${IC.right}</span></button>`).join('')}</div>`
+      : `<div class="row" style="gap:.5rem"><span class="i" style="color:var(--st-good)" aria-hidden="true">${IC.okCircle}</span><span>Todo en orden${good ? `: ${good === 1 ? '1 cosa va' : good + ' cosas van'} bien` : ''}.</span></div>`;
+    const pl = spendingPlan();
+    const planLine = !pl.empty && pl.free > 0 ? `<button type="button" class="plan-mini" data-act="gotoPj" data-v="tips"><span class="i" aria-hidden="true">${IC.piggy}</span><span>Sugerido${pl.unit ? ` por ${pl.unit}` : ' al mes'}: ahorra <b class="num">${esc(money(pl.save / (pl.unit ? pl.perMonth : 1), { decimals: 0 }))}</b> y deja <b class="num">${esc(money(pl.fun / (pl.unit ? pl.perMonth : 1), { decimals: 0 }))}</b> para gustos</span></button>` : '';
+    return panel('Recomendaciones', planLine + body, { link: vis.length > 3 ? `Ver las ${vis.length}` : 'Ver todas', linkAct: 'gotoPj', linkData: 'data-v="tips"' });
+  },
 };
 function cardSummary(a, detailed = false) {
   const c = cardInfo(a); const t = D.today();
@@ -2673,9 +3003,9 @@ function goalCard(g) {
 
 /* ---------- PROYECCIÓN ---------- */
 VIEWS.proj = function () {
-  const tabs = [['charts', 'Gráficas'], ['savings', 'Ahorro'], ['date', 'Simulador']];
-  let h = `<div class="seg" role="tablist">${tabs.map(([v, l]) => `<button type="button" role="tab" data-act="setPj" data-v="${v}" aria-pressed="${UI.pj === v}" aria-selected="${UI.pj === v}">${l}</button>`).join('')}</div>`;
-  h += ({ charts: projCharts, savings: projSavings, date: projDate })[UI.pj]();
+  const tabs = [['charts', 'Gráficas'], ['savings', 'Ahorro'], ['date', 'Simulador'], ['tips', 'Consejos']];
+  let h = `<div class="seg tight" role="tablist">${tabs.map(([v, l]) => `<button type="button" role="tab" data-act="setPj" data-v="${v}" aria-pressed="${UI.pj === v}" aria-selected="${UI.pj === v}">${l}</button>`).join('')}</div>`;
+  h += ({ charts: projCharts, savings: projSavings, date: projDate, tips: projTips })[UI.pj]();
   return h;
 };
 function projSavings() {
@@ -2720,7 +3050,7 @@ function projSavings() {
 /* ---------- Gráficas para tomar decisiones ---------- */
 const ST_LABEL = { good: 'Bien', warn: 'Atención', bad: 'Riesgo' };
 const ST_COLOR = { good: 'var(--st-good)', warn: 'var(--st-warn)', bad: 'var(--st-bad)' };
-function insight(html, icon = 'bulb') { return `<div class="insight"><span aria-hidden="true">${IC[icon]}</span><span>${html}</span></div>`; }
+function insight(html, icon = 'bulb') { return `<div class="insight"><span aria-hidden="true">${ico(icon)}</span><span>${html}</span></div>`; }
 function projCharts() {
   if (!S.rules.length && !S.accounts.length) return `<div class="panel">${emptyBox('chart', 'Agrega cuentas e ingresos para ver tus gráficas.', `<button type="button" class="btn" data-act="startWizard">Configurar mi app</button>`)}</div>`;
   const p = periodOf(D.today()); const k = healthKpis();
@@ -2909,6 +3239,87 @@ function simulatorHTML(base) {
     h += `<div class="label mt">Escenarios guardados</div><div class="list">${S.scenarios.map((s) => `<div class="item"><span class="item-main"><span class="item-title">${esc(s.name)}</span><span class="item-sub">${s.changes.length} ${s.changes.length === 1 ? 'cambio' : 'cambios'}</span></span><button type="button" class="btn sm ghost" data-act="simLoad" data-id="${s.id}">Cargar</button><button type="button" class="icon-btn" data-act="simDelSaved" data-id="${s.id}" aria-label="Eliminar escenario">${IC.trash}</button></div>`).join('')}</div>`;
   }
   return h + '</section>';
+}
+
+/* ---------- Recomendaciones ---------- */
+const TIP_LEVEL = { bad: 'Atiende ya', warn: 'Conviene mejorar', info: 'Idea', good: 'Vas bien' };
+function tipButton(x, cls = 'btn sm') {
+  if (!x.act) return '';
+  return `<button type="button" class="${cls}" data-act="${x.act}" data-id="${esc(x.arg || '')}" data-v="${esc(x.arg || '')}" data-dir="1">${esc(x.actLabel || 'Ver')}</button>`;
+}
+function tipCard(x) {
+  return `<article class="tip ${x.level}">
+    <div class="tip-top"><span class="tip-ico" aria-hidden="true">${ico(x.icon)}</span><h3><span class="sr">${TIP_LEVEL[x.level]}: </span>${esc(x.title)}</h3></div>
+    <p>${esc(x.text)}</p>
+    ${x.level !== 'good' ? `<div class="tip-actions">${tipButton(x)}<button type="button" class="btn sm ghost" data-act="tipHide" data-id="${esc(x.id)}">Ocultar</button></div>` : ''}
+  </article>`;
+}
+/** Plan sugerido: cuánto es necesario, cuánto ahorrar y cuánto dejar para gustos */
+function planPanel() {
+  const pl = spendingPlan(); if (pl.empty) return '';
+  const m0 = (v) => money(v, { decimals: 0 }); const pct = (v) => Math.round((v / pl.inc) * 100);
+  const per = (v) => m0(v / pl.perMonth);
+  const tt = totals(); const k = healthKpis();
+  const tile = (label, v, cls, sub) => `<div class="plan-tile ${cls}"><small>${label}</small><b>${esc(m0(v))}</b><span>${sub}</span></div>`;
+  let h = `<section class="panel"><div class="panel-h"><h2>Cuánto ahorrar y cuánto para gustos</h2></div>
+    <p class="lead-q" style="margin-top:0">Con base en ${esc(pl.basis)}. Ganas unos <b class="num">${esc(m0(pl.inc))}</b> al mes${pl.vin > 0 ? ' sin contar vales' : ''}. Así podrías repartirlo:</p>
+    <div class="plan-tiles">
+      ${tile('Necesario', pl.need, 'need', `${pct(pl.need)}%`)}
+      ${tile('Ahorro', pl.save, 'save', `${pct(pl.save)}%`)}
+      ${tile('Gustos, hasta', pl.fun, 'fun', `${pct(pl.fun)}%`)}
+    </div>`;
+  if (pl.unit && pl.free > 0) h += `<p class="plan-per">Por ${pl.unit}: aparta <b class="num">${esc(per(pl.save))}</b> y deja hasta <b class="num">${esc(per(pl.fun))}</b> para gustos.</p>`;
+  // barras: hoy contra sugerido
+  const tot = Math.max(pl.inc, pl.need + pl.want);
+  const seg = (v, c, n) => (v > 0 ? `<span style="--c:${c};width:${(v / tot) * 100}%" title="${esc(n)}"></span>` : '');
+  const leftNow = Math.max(0, pl.left);
+  h += `<div class="plan-bars">
+      <div class="plan-bar"><span class="plan-bar-l">Hoy</span><div class="split" role="img" aria-label="Hoy: necesario ${pct(pl.need)}%, gustos ${pct(pl.want)}%, te sobra ${pct(leftNow)}%">${seg(pl.need, 'var(--c-1)', 'Necesario')}${seg(pl.want, 'var(--c-2)', 'Gustos')}${seg(leftNow, 'var(--c-rest)', 'Te sobra')}</div></div>
+      <div class="plan-bar"><span class="plan-bar-l">Sugerido</span><div class="split" role="img" aria-label="Sugerido: necesario ${pct(pl.need)}%, gustos ${pct(pl.fun)}%, ahorro ${pct(pl.save)}%">${seg(pl.need, 'var(--c-1)', 'Necesario')}${seg(pl.fun, 'var(--c-2)', 'Gustos')}${seg(pl.save, 'var(--c-3)', 'Ahorro')}</div></div>
+    </div>
+    <div class="legend"><span><i class="box" style="background:var(--c-1)"></i>Necesario</span><span><i class="box" style="background:var(--c-2)"></i>Gustos</span><span><i class="box" style="background:var(--c-3)"></i>Ahorro</span><span><i class="box" style="background:var(--c-rest)"></i>Te sobra</span></div>`;
+  // qué hacer
+  const unitTxt = (v) => (pl.unit ? ` (${per(v)} por ${pl.unit})` : '');
+  if (pl.free <= 0) h += `<div class="alert bad mt-s"><span class="a-ico">${IC.alert}</span><span class="a-body">Lo necesario (${esc(m0(pl.need))}) ya es más que lo que ganas (${esc(m0(pl.inc))}).<small>Por ahora no alcanza para ahorrar ni para gustos. Revisa tus gastos fijos más grandes o busca un ingreso extra.</small></span></div>`;
+  else if (pl.want > pl.fun + 50) h += insight(`Hoy gastas <b class="num">${esc(m0(pl.want))}</b> al mes en gustos. Para poder apartar ${esc(m0(pl.save))}, bájalos a unos ${esc(m0(pl.fun))}: ${esc(m0(pl.want - pl.fun))} menos al mes${esc(unitTxt(pl.want - pl.fun))}.`, 'bulb');
+  else if (pl.left - pl.save > 50) h += insight(`Hoy gastas ${esc(m0(pl.want))} al mes en gustos, menos de lo que te tocaría. Si sigues así, podrías ahorrar hasta <b class="num">${esc(m0(pl.left))}</b> al mes${esc(unitTxt(pl.left))}; los ${esc(m0(pl.save))} sugeridos son lo mínimo para ir bien.`, 'okCircle');
+  else h += insight(`Tus gustos (${esc(m0(pl.want))} al mes) van justo con lo sugerido.`, 'okCircle');
+  if (pl.free > 0) {
+    const sv = S.settings.savings; const close = Math.abs(pl.rule - pl.save) <= Math.max(100, pl.save * 0.05);
+    if (close) h += insight(`Tu regla de ahorro ya aparta algo parecido: unos ${esc(m0(pl.rule))} al mes.`, 'okCircle');
+    else h += `<div class="insight"><span aria-hidden="true">${IC.piggy}</span><span>Tu regla de ahorro hoy aparta unos <b class="num">${esc(m0(pl.rule))}</b> al mes${sv.type === 'leftover' ? ' (lo que sobre al final)' : ''}. Lo sugerido es ${esc(m0(pl.save))}, el ${pl.rulePct}% de cada ingreso.<br><button type="button" class="btn sm mt-s" data-act="applyPlanSavings" data-v="${pl.rulePct}">Apartar el ${pl.rulePct}% de cada ingreso</button></span></div>`;
+    const months = k.exp > 0 ? tt.saved / k.exp : 99;
+    if (tt.debt > pl.inc * 0.5) h += insight(`Mientras debas ${esc(m0(tt.debt))} en tarjetas, usa ese ahorro primero para liquidarlas: su interés es mucho más alto que lo que gana cualquier ahorro.`, 'card');
+    else if (months < CONFIG.tips.emergencyMonths[0]) h += insight(`Lleva ese ahorro primero a tu fondo de emergencia, hasta juntar ${CONFIG.tips.emergencyMonths[0]} meses de gastos (${esc(m0(k.exp * CONFIG.tips.emergencyMonths[0]))}).`, 'shield');
+    if (pl.save > 0) h += `<p class="muted small mt-s">En un año serían unos ${esc(m0(pl.save * 12))} ahorrados.</p>`;
+  }
+  // qué cuenta como gusto
+  const names = (arr) => arr.slice(0, 4).map((x) => `${x.id === '_none' ? 'Sin categoría' : catName(x.id, false)} ${m0(x.amt)}`);
+  h += `<details class="data-view"><summary>¿Qué cuenta como necesario y qué como gusto?</summary><div class="small">
+      ${pl.wants.length ? `<p style="margin:.25rem 0"><b>Gustos:</b> ${esc(listJoin(names(pl.wants)))}${pl.wants.length > 4 ? '…' : ''}.</p>` : '<p style="margin:.25rem 0"><b>Gustos:</b> no hay gastos en categorías de gustos.</p>'}
+      ${pl.needs.length ? `<p style="margin:.25rem 0"><b>Necesario:</b> ${esc(listJoin(names(pl.needs)))}${pl.needs.length > 4 ? '…' : ''}.</p>` : ''}
+      <p class="muted" style="margin:.25rem 0">Puedes cambiar si una categoría es necesaria o un gusto al editarla en Movimientos → Categorías. Los vales no entran porque no se pueden ahorrar. Es una guía basada en la regla 50/30/20 (necesario, gustos, ahorro), ajustada a lo que te deja lo necesario.</p>
+      <button type="button" class="btn sm ghost" data-act="gotoBudgets">Ver mis categorías</button></div></details>
+  </section>`;
+  return h;
+}
+function projTips() {
+  const all = recommendations();
+  if (!all.length) return `<div class="panel">${emptyBox('bulb', 'Cuando registres tus ingresos y gastos, aquí verás recomendaciones con tus números.', `<button type="button" class="btn" data-act="startWizard">Configurar mi app</button>`)}</div>`;
+  const hid = hiddenTipIds(); const vis = all.filter((x) => !hid.has(x.id)); const k = healthKpis();
+  const n = (lv) => vis.filter((x) => x.level === lv).length;
+  const counts = [['bad', 'urgentes'], ['warn', 'por mejorar'], ['info', 'ideas'], ['good', 'van bien']].filter(([lv]) => n(lv)).map(([lv, l]) => `<span class="tip-count ${lv}"><b>${n(lv)}</b> ${l}</span>`).join('');
+  let h = `<section class="panel"><div class="panel-h"><h2>Recomendaciones</h2></div>
+    <p class="lead-q" style="margin-top:0">Con base en tus ingresos, gastos, tarjetas y metas${k.basis ? ` (${esc(k.basis)})` : ''}. Cambian solas cada vez que registras algo.</p>
+    <div class="tip-counts">${counts}</div></section>`;
+  h += planPanel();
+  for (const [lv, title] of [['bad', 'Atiende primero'], ['warn', 'Conviene mejorar'], ['info', 'Ideas para ti'], ['good', 'Lo que vas haciendo bien']]) {
+    const xs = vis.filter((x) => x.level === lv); if (!xs.length) continue;
+    h += `<h2 class="tips-group">${title}</h2>${xs.map(tipCard).join('')}`;
+  }
+  if (hid.size) h += `<button type="button" class="btn outline block mt" data-act="tipsShowHidden">Mostrar ${hid.size === 1 ? 'la recomendación oculta' : `las ${hid.size} ocultas`}</button>`;
+  h += `<p class="muted small mt">Son sugerencias automáticas a partir de lo que registras en la app; no sustituyen la asesoría de un profesional en finanzas.</p>`;
+  return h;
 }
 
 /* ---------- AJUSTES ---------- */
@@ -3345,6 +3756,8 @@ function openAccountSheet(id) {
 function openCategoryForm(cat = null, { kind = 'expense', onSaved, parentId = null } = {}) {
   const d = cat ? clone(cat) : { name: '', icon: kind === 'income' ? 'coins' : 'box', color: CONFIG.palette[S.categories.length % CONFIG.palette.length], kind, parentId, budget: null, alert: null };
   const hasKids = cat && S.categories.some((c) => c.parentId === cat.id);
+  // necesario o gusto: lo que marcó el usuario o lo que se deduce del nombre
+  const wantOf = () => (typeof d.want === 'boolean' ? d.want : cat ? catIsWant(cat.id) : wantRegex().test(d.name || ''));
   const sh = openSheet({ title: cat ? 'Editar categoría' : 'Nueva categoría', tall: true, foot: `${cat ? `<button type="button" class="btn danger" data-del>${IC.trash}</button>` : '<button type="button" class="btn ghost" data-close>Cancelar</button>'}<button type="button" class="btn" data-save>Guardar</button>` });
   function draw() {
     let sum1 = '';
@@ -3355,10 +3768,12 @@ function openCategoryForm(cat = null, { kind = 'expense', onSaved, parentId = nu
       <div class="row"><span class="ico" data-preview-icon style="${tint(d.color)}" aria-hidden="true">${glyph(d.icon)}</span><input class="input" name="name" value="${esc(d.name)}" placeholder="Nombre de la categoría" aria-label="Nombre de la categoría"></div>
       <div class="field mt-s"><span>Ícono</span>${iconGrid(d.icon, d.color)}</div>
       <div class="field"><span>Color</span>${swatches(d.color)}</div>
-      ${!hasKids ? `<label class="field"><span>Dentro de (subcategoría)</span><select class="input" name="parentId">${opt('', 'Ninguna, es categoría principal', d.parentId || '')}${parents.map((c) => opt(c.id, c.icon + ' ' + c.name, d.parentId)).join('')}</select></label>` : ''}
+      ${!hasKids ? `<label class="field"><span>Dentro de (subcategoría)</span><select class="input" name="parentId">${opt('', 'Ninguna, es categoría principal', d.parentId || '')}${parents.map((c) => opt(c.id, c.name, d.parentId)).join('')}</select></label>` : ''}
+      ${d.kind === 'expense' ? `<div class="field"><span>¿Qué tipo de gasto es?</span>${segHTML('cwant', [['need', 'Necesario'], ['want', 'Gusto']], wantOf() ? 'want' : 'need')}<span class="hint">Se usa para sugerirte cuánto ahorrar y cuánto dejar para gustos.</span></div>` : ''}
       ${d.kind === 'expense' ? `<div class="grid2"><label class="field"><span>Presupuesto por periodo</span>${moneyInput('budget', d.budget, { placeholder: 'Sin límite' })}</label><label class="field"><span>Avisar al (%)</span><input class="input" name="alert" inputmode="numeric" value="${esc(d.alert == null ? '' : d.alert)}" placeholder="General: ${S.settings.budgets.alertPercent}"></label></div>` : ''}`);
   }
   draw(); bindPickers(sh.body, d, () => { const pv = $('[data-preview-icon]', sh.body); if (pv) { pv.innerHTML = glyph(d.icon); pv.setAttribute('style', tint(d.color)); } });
+  sh.body.addEventListener('click', (e) => { const w = e.target.closest('[data-seg="cwant"]'); if (!w) return; d.want = w.dataset.v === 'want'; $$('[data-seg="cwant"]', sh.body).forEach((b) => b.setAttribute('aria-pressed', b === w)); });
   sh.body.addEventListener('click', (e) => { const s = e.target.closest('[data-seg="ckind"]'); if (s) { Object.assign(d, pickCatFields(sh.body)); d.kind = s.dataset.v; d.parentId = null; d.icon = d.kind === 'income' && d.icon === 'box' ? 'coins' : d.icon; draw(); } });
   function pickCatFields(root) { const v = readFields(root); return { name: (v.name || '').trim(), parentId: v.parentId || null, budget: v.budget ? parseAmount(v.budget) : null, alert: v.alert === '' || v.alert == null ? null : clampN(parseInt(v.alert, 10) || 0, 1, 100) }; }
   $('[data-save]', sh.el).onclick = () => {
@@ -3366,6 +3781,7 @@ function openCategoryForm(cat = null, { kind = 'expense', onSaved, parentId = nu
     if (f.budget != null && isNaN(f.budget)) return toast('Revisa el presupuesto.', 'error');
     const icon = d.icon;
     const data = { name: f.name, icon, color: d.color, kind: d.kind, parentId: hasKids ? null : f.parentId, budget: d.kind === 'expense' && f.budget > 0 ? f.budget : null, alert: d.kind === 'expense' ? f.alert : null };
+    if (d.kind === 'expense' && typeof d.want === 'boolean') data.want = d.want;
     let c = cat; if (cat) Object.assign(cat, data); else { c = Object.assign({ id: uid() }, data); S.categories.push(c); }
     save(); sh.close(); render(); toast('Categoría guardada.', 'ok'); if (onSaved) onSaved(c);
   };
@@ -3381,8 +3797,8 @@ function openCategoryForm(cat = null, { kind = 'expense', onSaved, parentId = nu
 }
 
 /* ---------- Metas ---------- */
-function openGoalForm(goal = null, { onSaved } = {}) {
-  const d = goal ? clone(goal) : { name: '', icon: 'target', color: CONFIG.palette[S.goals.length % CONFIG.palette.length], target: null, initial: null, deadline: '', priority: S.goals.length + 1 > 5 ? 3 : S.goals.length + 1, percent: '', rate: '', accountId: null };
+function openGoalForm(goal = null, { onSaved, preset } = {}) {
+  const d = goal ? clone(goal) : Object.assign({ name: '', icon: 'target', color: CONFIG.palette[S.goals.length % CONFIG.palette.length], target: null, initial: null, deadline: '', priority: S.goals.length + 1 > 5 ? 3 : S.goals.length + 1, percent: '', rate: '', accountId: null }, preset || {});
   const sh = openSheet({ title: goal ? 'Editar meta' : 'Nueva meta', tall: true, foot: `${goal ? `<button type="button" class="btn danger" data-del>${IC.trash}</button>` : '<button type="button" class="btn ghost" data-close>Cancelar</button>'}<button type="button" class="btn" data-save>Guardar</button>` });
   const savAcc = activeAccounts().filter((a) => a.type === 'savings' || a.type === 'debit');
   sh.setBody(`<div class="row"><span class="ico" data-preview-icon style="${tint(d.color)}" aria-hidden="true">${glyph(d.icon, 'target')}</span><input class="input" name="name" value="${esc(d.name)}" placeholder="Ej. Fondo de emergencia" aria-label="Nombre de la meta"></div>
@@ -3818,6 +4234,17 @@ Object.assign(ACT, {
   setHorizon: (d) => { const pr = S.settings.projection; if (d.m === 'date') { pr.horizonType = 'date'; if (!D.valid(pr.endDate) || pr.endDate <= D.today()) pr.endDate = D.addMonths(D.today(), 36); } else { pr.horizonType = 'months'; pr.months = +d.m; } save(); render(); },
   setVarMode: (d) => { S.settings.projection.variableMode = d.v; save(); render(); },
   setPj: (d) => { UI.pj = d.v; render(); },
+  gotoPj: (d) => { closeAllSheets(); UI.tab = 'proj'; UI.pj = d.v; render(); },
+  gotoSim: (d) => { closeAllSheets(); UI.tab = 'proj'; UI.pj = 'date'; if (D.valid(d.id) && d.id > D.today()) UI.sd.date = d.id; render(); },
+  gotoRules: () => { closeAllSheets(); UI.tab = 'moves'; UI.mv = 'rules'; render(); },
+  tipHide: (d) => { S.meta.tipsHidden[d.id] = D.today(); save(); render(); toast(`Listo, no la verás por ${CONFIG.tips.hideDays} días.`, 'ok'); },
+  tipsShowHidden: () => { S.meta.tipsHidden = {}; save(); render(); },
+  applyPlanSavings: async (d) => {
+    const pct = +d.v; const pl = spendingPlan(); if (!(pct > 0)) return;
+    if (!(await confirmDlg(`Tu regla de ahorro cambiará a apartar el <b>${pct}%</b> de cada ingreso (sin contar vales), unos ${esc(money((pl.inc * pct) / 100, { decimals: 0 }))} al mes. Puedes cambiarla cuando quieras en Ajustes → Regla de ahorro.`, { title: 'Usar el ahorro sugerido', ok: 'Usar esta regla' }))) return;
+    Object.assign(S.settings.savings, { type: 'percent', percent: pct }); save(); render(); toast(`Listo: apartarás el ${pct}% de cada ingreso.`, 'ok');
+  },
+  newEmergencyGoal: (d) => openGoalForm(null, { preset: { name: 'Fondo de emergencia', icon: 'shield', target: +d.id || null, priority: 1 } }),
   sdPreset: (d) => { UI.sd.date = d.d; render(); },
   sdToggle: (d, el) => { UI.sd[el.name] = el.checked; render(); },
   sdKind: (d) => { UI.sdKind = d.v; $$('[data-act="sdKind"]').forEach((b) => b.setAttribute('aria-pressed', b.dataset.v === d.v)); },
