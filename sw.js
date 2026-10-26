@@ -4,7 +4,7 @@
  * Cuando cambies index.html, sube el número de VERSION para
  * que los teléfonos descarguen la nueva versión.
  * ========================================================= */
-const VERSION = 'v1.5.0';
+const VERSION = 'v1.3.1';
 const CACHE = 'mis-finanzas-' + VERSION;
 const FONTS = 'mis-finanzas-fuentes';
 
