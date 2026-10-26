@@ -387,6 +387,34 @@ details.data-view>summary::-webkit-details-marker{display:none}
 .pay-pill span{color:var(--muted)}
 .pay-pill b{font-family:var(--font-num);font-weight:600}
 .debt-cycle .pay-pill{background:var(--surface)}
+.plan-edit{margin-top:.5rem;min-height:44px}
+.wf{display:flex;flex-direction:column;margin-top:.25rem}
+.wf-row{display:grid;grid-template-columns:1fr auto;align-items:center;column-gap:.75rem;row-gap:.375rem;padding:.625rem 0;border:0;border-bottom:1px solid var(--line);background:none;color:inherit;font:inherit;text-align:left;width:100%;min-height:44px}
+button.wf-row{cursor:pointer}
+button.wf-row:active{background:var(--surface-2)}
+.wf-row.total{padding:.75rem 0}
+.wf-row.end{border-bottom:0;border-top:2px solid var(--ink);margin-top:-1px}
+.wf-l{display:flex;align-items:center;gap:.625rem;min-width:0}
+.wf-l b{display:block;font-weight:600;font-size:.9375rem;line-height:1.3}
+.wf-l small{display:block;color:var(--muted);font-size:.8125rem}
+.wf-ico{display:inline-grid;place-items:center;width:32px;height:32px;border-radius:10px;background:var(--surface-2);color:var(--muted);flex:none}
+.wf-ico svg{width:18px;height:18px}
+.wf-v{font-family:var(--font-num);font-weight:600;white-space:nowrap}
+.wf-row.total .wf-v{font-size:1.0625rem}
+.wf-bar{grid-column:1 / -1;height:6px;border-radius:3px;background:var(--surface-2);overflow:hidden}
+.wf-bar i{display:block;height:100%;border-radius:3px;background:var(--c-1)}
+.wf-bar i.up{background:var(--income)}
+.wf-bar i.down{background:var(--expense)}
+.wf-bar i.base{background:var(--c-1)}
+.plan-edit svg{width:16px;height:16px}
+.split-row{display:grid;grid-template-columns:1fr 9.5rem;align-items:center;gap:.75rem;padding:.5rem 0;border-bottom:1px solid var(--line)}
+.split-row:last-of-type{border-bottom:0}
+.split-row .sr-l b{display:block;font-weight:600}
+.split-row .sr-l small{display:block;color:var(--muted);font-size:.8125rem}
+.split-row .input{text-align:right;font-family:var(--font-num)}
+.split-row .sr-rest{text-align:right;font-family:var(--font-num);font-weight:600;padding-right:.875rem}
+.split-sum{margin-top:.75rem;padding:.625rem .75rem;border-radius:var(--r-sm);background:var(--surface-2);font-size:.875rem}
+.split-sum.bad{background:color-mix(in srgb,var(--st-bad) 14%,var(--surface));color:color-mix(in srgb,var(--st-bad) 80%,var(--ink))}
 table.data.cmp th{white-space:normal;vertical-align:bottom;line-height:1.2}
 table.data.cmp tr.low td{font-weight:600;border-bottom:0}
 table.data.cmp tr.low td:first-child{font-family:inherit}
@@ -496,7 +524,7 @@ table.data.cmp td:first-child{font-family:inherit}
 const CONFIG = {
   app: {
     name: 'Mis Finanzas',
-    version: '1.4.0',
+    version: '1.5.0',
     storageKey: 'misFinanzas.v1',   // clave en localStorage
     schema: 1,                      // versión del formato de datos
   },
@@ -834,7 +862,7 @@ function newState() {
     schema: CONFIG.app.schema, setupDone: false, startDate: t,
     settings: clone(CONFIG.defaults),
     accounts: [], categories: defaultCategories(), rules: [], goals: [], holidays: [], scenarios: [],
-    sim: { debts: [], cardPlan: {}, extras: [] },   // deudas, formas de pago y extras del simulador (no son movimientos)
+    sim: { debts: [], cardPlan: {}, extras: [], split: {} },   // deudas, formas de pago, montos por cobro y extras del simulador (no son movimientos)
     meta: { notified: {}, savingsAppliedUntil: null, holidayYears: [], reminderShown: null, tipsHidden: {} },
   };
 }
@@ -852,6 +880,7 @@ function migrate(s) {
   out.sim = Object.assign(newState().sim, isObj(s.sim) ? s.sim : {});
   for (const k of ['debts', 'extras']) if (!Array.isArray(out.sim[k])) out.sim[k] = [];
   if (!isObj(out.sim.cardPlan)) out.sim.cardPlan = {};
+  if (!isObj(out.sim.split)) out.sim.split = {};
   if (!isObj(out.meta.tipsHidden)) out.meta.tipsHidden = {};
   for (const r of out.rules) { r.exc = r.exc || {}; r.pauses = r.pauses || []; r.freq = normFreq(r.freq); r.created = r.created || out.startDate; }
   for (const g of out.goals) { g.history = g.history || []; }
@@ -1600,6 +1629,25 @@ function splitAmount(total, n) {
   n = Math.max(1, n); const part = Math.floor((total / n) * 100) / 100;
   const out = Array(n).fill(part); out[n - 1] = round2(total - part * (n - 1)); return out;
 }
+/** Cuánto pagar en la parte i de un pago dividido.
+ *  custom = { fecha: monto } con los montos que eligió el usuario para algunos cobros.
+ *  Los cobros sin monto elegido se reparten por igual lo que falta, y el último cobro
+ *  siempre paga el resto (así la deuda queda saldada en su fecha límite). */
+function partShare(left, i, dates, custom) {
+  const n = dates.length; left = Math.max(0, left);
+  if (i >= n - 1) return round2(left);
+  const c = custom || {};
+  if (c[dates[i]] != null && c[dates[i]] !== '') return round2(Math.min(+c[dates[i]] || 0, left));
+  let fixedAfter = 0, free = 2;                       // esta parte y la última
+  for (let j = i + 1; j < n - 1; j++) { if (c[dates[j]] != null && c[dates[j]] !== '') fixedAfter += +c[dates[j]] || 0; else free++; }
+  return Math.floor((Math.max(0, left - fixedAfter) / free) * 100) / 100;
+}
+/** Todas las partes de un pago dividido de monto conocido */
+function splitParts(total, dates, custom) {
+  const out = []; let left = +total || 0;
+  dates.forEach((d, i) => { const a = partShare(left, i, dates, custom); out.push(a); left = round2(left - a); });
+  return out;
+}
 /** Deudas del simulador que aún no vencen */
 function activeSimDebts() { const t = D.today(); return S.sim.debts.filter((x) => +x.amount > 0 && D.valid(x.due) && x.due >= t); }
 
@@ -1620,7 +1668,7 @@ function simulateTo(end, opt = {}) {
   const applySavings = opt.applySavings !== false; const payCards = opt.payCards !== false;
   const extras = opt.extras || [];
   const debts = (opt.debts || []).filter((x) => +x.amount > 0 && D.valid(x.due));
-  const cardPlan = opt.cardPlan || {}; const force = opt.force || null;
+  const cardPlan = opt.cardPlan || {}; const force = opt.force || null; const splitMap = opt.split || {};
   const planOf = (p) => (force && p !== 'none' ? force : p);
   const key = `sim|${end}|${vmode}|${applySavings ? 1 : 0}|${payCards ? 1 : 0}`;
   const run = () => {
@@ -1648,7 +1696,7 @@ function simulateTo(end, opt = {}) {
       if (o.kind === 'adjust') continue;
       ev.push({ d: o.date < t ? t : o.date, kind: o.kind, amt: o.hasAmount ? o.amount : baseAmount(o.rule, vmode), from: o.accountId, to: o.toAccountId, name: o.name, cat: o.categoryId });
     }
-    for (const x of extras) if (x.date >= t && x.date <= end && +x.amount > 0) ev.push({ d: x.date, kind: x.kind, amt: +x.amount, from: x.accountId, name: x.name || (x.kind === 'income' ? 'Ingreso extra' : 'Gasto extra'), extra: true });
+    for (const x of extras) if (x.date >= t && x.date <= end && +x.amount > 0) ev.push({ d: x.date, kind: x.kind, amt: +x.amount, from: findAcc(x.accountId) ? x.accountId : mainId, name: x.name || (x.kind === 'income' ? 'Ingreso extra' : 'Gasto extra'), extra: true });
     // cobros hasta la fecha límite más lejana (para saber en cuántas partes se divide cada deuda)
     const cards = payCards ? S.accounts.filter((x) => x.type === 'credit' && !x.archived) : [];
     let far = end; for (const x of debts) if (x.due > far) far = x.due;
@@ -1656,7 +1704,7 @@ function simulateTo(end, opt = {}) {
     const paydays = debts.length || cards.length ? paydayDates(t, D.min(far, D.add(t, 800)), ruleArg) : [];
     for (const x of debts) {
       const plan = planOf(x.plan || 'split') === 'none' ? 'due' : planOf(x.plan || 'split');
-      const dates = planDates(plan, t, x.due, paydays); const parts = splitAmount(+x.amount, dates.length);
+      const dates = planDates(plan, t, x.due, paydays); const parts = splitParts(+x.amount, dates, splitMap['debt:' + x.id]);
       const from = x.accountId && isLiquidAcc(findAcc(x.accountId)) ? x.accountId : mainId;
       dates.forEach((d, i) => { if (d <= end) ev.push({ d, kind: 'debtpay', debt: x.id, amt: parts[i], from, name: x.name, due: x.due, part: i, of: dates.length }); });
     }
@@ -1664,7 +1712,7 @@ function simulateTo(end, opt = {}) {
     for (const a of cards) {
       const plan = planOf(cardPlan[a.id] || 'due'); if (plan === 'none') continue;
       const c = cardInfo(a);
-      const add = (from, due, fixed) => planDates(plan, from, due, paydays).forEach((d, i, arr) => { if (d <= end) ev.push({ d, kind: 'cardpay', card: a.id, fixed, part: i, of: arr.length, due }); });
+      const add = (from, due, fixed) => planDates(plan, from, due, paydays).forEach((d, i, arr) => { if (d <= end) ev.push({ d, kind: 'cardpay', card: a.id, fixed, part: i, of: arr.length, dates: arr, custom: splitMap[`card:${a.id}:${due}`], due }); });
       if (c.pendingLast > 0) add(t, c.dueLast, c.pendingLast);
       for (let cut = c.nextCut, k = 0; cut <= end && k < 400; cut = cutDateOn(a, D.p(cut).y, D.p(cut).m + 1), k++) {
         ev.push({ d: cut, kind: 'cut', card: a.id });
@@ -1674,13 +1722,25 @@ function simulateTo(end, opt = {}) {
     ev.sort((x, y) => (x.d < y.d ? -1 : x.d > y.d ? 1 : (RANK[x.kind] || 0) - (RANK[y.kind] || 0)));
 
     // simulación
-    const R = { inc: 0, exp: 0, saved: 0, interest: 0, cardPaid: 0, debtPaid: 0, extraIn: 0, extraOut: 0, byName: {} };
+    const R = { inc: 0, exp: 0, saved: 0, interest: 0, liqInt: 0, cardPaid: 0, debtPaid: 0, extraIn: 0, extraOut: 0, byName: {} };
+    // desglose: cada movimiento que cambia el disponible (efectivo y débito), para explicar el saldo final
+    const ledger = []; const off = { card: 0, vouchers: 0 }; const liquidSet = new Set(liquidIds);
+    const ledgerOf = (e, dl) => {
+      let cls = 'exp', name = e.name, acc = e.from;
+      if (e.kind === 'income') cls = 'inc';
+      else if (e.kind === 'transfer') { const to = findAcc(e.to); cls = to && to.type === 'credit' ? 'card' : 'trf'; acc = dl < 0 ? e.from : e.to; name = e.name || (to ? 'Transferencia a ' + to.name : 'Transferencia'); }
+      else if (e.kind === 'cardpay') { cls = 'card'; name = 'Pago de ' + ((findAcc(e.card) || {}).name || 'tarjeta'); acc = mainId; }
+      else if (e.kind === 'debtpay') cls = 'debt';
+      else if (e.kind === 'save') { cls = 'save'; name = 'Ahorro para tus metas'; acc = e.src; }
+      return { d: e.d, cls, name: name || (cls === 'inc' ? 'Ingreso' : 'Gasto'), amt: dl, acc, cat: e.cat || null, extra: !!e.extra,
+        part: e.of > 1 ? e.part + 1 : 0, of: e.of > 1 ? e.of : 0, goals: e.goals || null, bal: liquidNow() };
+    };
     const pays = [];                                    // cada pago de tarjeta o deuda: {d, ref, kind, amt, due}
     const after = {};                                   // disponible al cerrar cada día con movimientos
     const stmt = {}, paid = {}; let last = t;
     const grow = (to) => {
       const days = D.diff(last, to); if (days <= 0) return;
-      for (const a of S.accounts) { const r = +a.rate || 0; if (r && (bal[a.id] || 0) > 0) { const g = bal[a.id] * (Math.pow(1 + r / 100, days / 365) - 1); bal[a.id] += g; R.interest += g; } }
+      for (const a of S.accounts) { const r = +a.rate || 0; if (r && (bal[a.id] || 0) > 0) { const g = bal[a.id] * (Math.pow(1 + r / 100, days / 365) - 1); bal[a.id] += g; R.interest += g; if (liquidSet.has(a.id)) R.liqInt += g; } }
       for (const g of goals) if (g.rate && g.value > 0) { const x = g.value * (Math.pow(1 + g.rate / 100, days / 365) - 1); g.value += x; if (!g.accountId) R.interest += x; }
       last = to;
     };
@@ -1693,12 +1753,13 @@ function simulateTo(end, opt = {}) {
     for (let d = D.add(t, step); ; d = D.add(d, step)) {
       if (d > end) d = end;
       while (ei < ev.length && ev[ei].d <= d) {
-        const e = ev[ei++]; grow(e.d);
+        const e = ev[ei++]; grow(e.d); const before = liquidNow();
         if (e.kind === 'income') {
           if (findAcc(e.from)) bal[e.from] += e.amt; R.inc += e.amt; if (e.extra) R.extraIn += e.amt;
           if (findAcc(e.from) && findAcc(e.from).type === 'credit') paid[e.from] = (paid[e.from] || 0) + e.amt;
         } else if (e.kind === 'expense') {
           if (findAcc(e.from)) bal[e.from] -= e.amt; R.exp += e.amt; if (e.extra) R.extraOut += e.amt;
+          const fa = findAcc(e.from); if (fa && fa.type === 'credit') off.card += e.amt; else if (fa && fa.type === 'vouchers') off.vouchers += e.amt;
           const k = e.name || 'Gasto'; R.byName[k] = R.byName[k] || { name: k, cat: e.cat, total: 0, n: 0 }; R.byName[k].total += e.amt; R.byName[k].n++;
         } else if (e.kind === 'transfer') {
           if (findAcc(e.from)) bal[e.from] -= e.amt; if (findAcc(e.to)) bal[e.to] += e.amt;
@@ -1709,7 +1770,7 @@ function simulateTo(end, opt = {}) {
           // cada parte paga lo que falta entre las partes que quedan (la última liquida el resto)
           const owed = e.fixed != null ? e.fixed : (stmt[e.card] || 0);
           const left = Math.max(0, owed - (paid[e.card] || 0));
-          const amt = round2(Math.max(0, Math.min(left / Math.max(1, e.of - e.part), Math.max(0, -(bal[e.card] || 0)))));
+          const amt = round2(Math.max(0, Math.min(partShare(left, e.part, e.dates, e.custom), Math.max(0, -(bal[e.card] || 0)))));
           if (amt > 0 && mainId) { bal[mainId] -= amt; bal[e.card] += amt; paid[e.card] = (paid[e.card] || 0) + amt; R.cardPaid += amt; pays.push({ d: e.d, ref: e.card, kind: 'card', amt, due: e.due }); }
           if (e.fixed != null && e.part === e.of - 1) paid[e.card] = 0;
         } else if (e.kind === 'debtpay') {
@@ -1719,11 +1780,14 @@ function simulateTo(end, opt = {}) {
           const src = sv.fromAccountId && findAcc(sv.fromAccountId) ? sv.fromAccountId : mainId;
           const mode = sv.distribution === 'manual' ? (goals.some((g) => g.percent > 0) ? 'percent' : 'priority') : sv.distribution;
           const { alloc } = allocate(e.amt, mode, goals.map((g) => ({ id: g.id, need: Math.max(0, g.target - g.value), priority: g.priority, percent: g.percent, deadline: g.deadline })));
+          e.src = src; e.goals = [];
           for (const [id, a] of Object.entries(alloc)) {
-            const g = goals.find((x) => x.id === id); g.value += a; R.saved += a;
+            const g = goals.find((x) => x.id === id); g.value += a; R.saved += a; e.goals.push(g.name);
             if (src) bal[src] -= a; if (g.accountId) bal[g.accountId] += a;
           }
         }
+        const dl = round2(liquidNow() - before);
+        if (Math.abs(dl) > 0.004) ledger.push(ledgerOf(e, dl));
         for (const g of goals) if (!g.reached && g.target > 0 && g.value >= g.target - 0.005) g.reached = e.d;
         checkLow(e.d); after[e.d] = liquidNow();
       }
@@ -1735,6 +1799,7 @@ function simulateTo(end, opt = {}) {
     const p0 = points[0], p1 = points[points.length - 1];
     return {
       end, points, accounts, goals, low, firstNeg, pays, after, paydays: paydays.filter((d) => d <= end),
+      ledger, offCard: round2(off.card), offVouchers: round2(off.vouchers), liqInterest: round2(R.liqInt),
       liquid0: p0.liquid, liquid1: p1.liquid, net0: p0.net, net1: p1.net, saved0: p0.saved, saved1: p1.saved,
       debt0: round2(sum(S.accounts.filter((a) => a.type === 'credit'), (a) => Math.max(0, -(bal0[a.id] || 0)))), debt1: debtNow(),
       other0: round2(sum(debts, (x) => +x.amount)), other1: otherNow(),
@@ -3212,14 +3277,7 @@ function projDate() {
     ${dataTable(['Fecha', 'Disponible', 'Patrimonio'], r.points.filter((_, i) => i % Math.max(1, Math.round(r.points.length / 12)) === 0 || i === r.points.length - 1).map((x) => [fmtDate(x.date, 'full'), money(x.liquid, { decimals: 0 }), money(x.net, { decimals: 0 })]))}
   </section>`;
   h += debtsPanel(base);
-  h += panel('De hoy a esa fecha', `
-    <div class="kv"><span>Ingresos</span><span class="in">+${esc(money(r.inc, { decimals: 0 }))}</span></div>
-    <div class="kv"><span>Gastos</span><span>−${esc(money(r.exp, { decimals: 0 }))}</span></div>
-    ${sd.savings ? `<div class="kv"><span>Apartado para metas</span><span>${esc(money(r.saved, { decimals: 0 }))}</span></div>` : ''}
-    ${r.cardPaid ? `<div class="kv"><span>Pagos de tarjetas</span><span>${esc(money(r.cardPaid, { decimals: 0 }))}</span></div>` : ''}
-    ${r.debtPaid ? `<div class="kv"><span>Pagos de otras deudas</span><span>${esc(money(r.debtPaid, { decimals: 0 }))}</span></div>` : ''}
-    ${r.interest > 0.5 ? `<div class="kv"><span>Rendimientos</span><span class="in">+${esc(money(r.interest, { decimals: 0 }))}</span></div>` : ''}
-    ${r.topExpenses.length ? `<div class="label mt-s">Gastos más grandes</div><div class="list">${r.topExpenses.map((x) => `<div class="item" style="min-height:48px"><span class="ico sm" style="${tint(catColor(x.cat))}" aria-hidden="true">${catIcon(x.cat)}</span><span class="item-main"><span class="item-title">${esc(x.name)}</span><span class="item-sub">${x.n === 1 ? '1 vez' : x.n + ' veces'}</span></span><span class="amt">${esc(money(x.total, { decimals: 0 }))}</span></div>`).join('')}</div>` : ''}`);
+  h += breakdownPanel(r);
   h += panel('Tus cuentas ese día', `<div class="list">${r.accounts.map((x) => { const cr = x.acc.type === 'credit'; return `<div class="item" style="min-height:52px"><span class="ico sm" aria-hidden="true">${accIcon(x.acc)}</span><span class="item-main"><span class="item-title">${esc(x.acc.name)}</span><span class="item-sub">Hoy ${esc(cr ? money(Math.max(0, -x.start), { decimals: 0 }) + ' de deuda' : money(x.start, { decimals: 0 }))}</span></span><span class="item-end"><span class="amt">${esc(cr ? money(Math.max(0, -x.end), { decimals: 0 }) : money(x.end, { decimals: 0 }))}</span>${cr ? '<span class="muted tiny">deuda</span>' : delta(x.end - x.start)}</span></div>`; }).join('') || '<div class="muted">Sin cuentas.</div>'}</div>`);
   if (r.goals.length) h += panel('Tus metas ese día', r.goals.map((g) => { const pct = g.target ? Math.min(100, (g.value / g.target) * 100) : 0; return `<div class="mt-s"><div class="row between" style="align-items:baseline"><span class="grow row" style="gap:.375rem"><span class="i" aria-hidden="true" style="color:color-mix(in srgb,${g.color} 70%,var(--ink))">${glyph(g.icon, 'target')}</span>${esc(g.name)}</span><span class="tiny num nowrap">${esc(money(g.value, { decimals: 0 }))} / ${esc(money(g.target, { decimals: 0 }))}</span></div>${progressBar(pct, g.color || 'var(--primary)')}<div class="item-sub">${g.reached ? (g.start >= g.target ? 'Ya está lograda' : 'La alcanzas el ' + esc(fmtDate(g.reached, 'long'))) : `${Math.round(pct)}%, faltarían ${esc(money(Math.max(0, g.target - g.value), { decimals: 0 }))}`}</div></div>`; }).join(''));
   h += panel('Supuestos', `${switchHTML('Aplicar mi regla de ahorro', { act: 'sdToggle', name: 'savings', checked: sd.savings, sub: savingsPlan(periodOf(t)).text })}
@@ -3237,30 +3295,108 @@ function projDate() {
   return h;
 }
 
+/* ---------- Desglose: ¿por qué tendrás ese disponible? ---------- */
+const LEDGER = {
+  inc: { label: 'Ingresos', icon: 'briefcase' },
+  exp: { label: 'Gastos con efectivo y débito', icon: 'cart' },
+  card: { label: 'Pagos de tarjetas', icon: 'card' },
+  debt: { label: 'Pagos de otras deudas', icon: 'receipt' },
+  save: { label: 'Ahorro para tus metas', icon: 'piggy' },
+  trf: { label: 'Transferencias entre cuentas', icon: 'swap' },
+};
+const ledgerName = (x) => x.name + (x.of ? ` (${x.part} de ${x.of})` : '');
+const ledgerIcon = (x) => ((x.cls === 'inc' || x.cls === 'exp') && x.cat && findCat(x.cat) ? catIcon(x.cat) : ico(LEDGER[x.cls].icon));
+function breakdownPanel(r) {
+  const by = {}, cnt = {};
+  for (const x of r.ledger) { by[x.cls] = (by[x.cls] || 0) + x.amt; cnt[x.cls] = (cnt[x.cls] || 0) + 1; }
+  const rows = Object.keys(LEDGER).filter((c) => Math.abs(by[c] || 0) > 0.5).map((c) => ({ c, amt: round2(by[c]), n: cnt[c] }));
+  const mx = Math.max(1, Math.abs(r.liquid0), Math.abs(r.liquid1), ...rows.map((x) => Math.abs(x.amt)), r.liqInterest);
+  const m0 = (v, sign) => money(v, { decimals: 0, sign });
+  const bar = (v, cls) => `<span class="wf-bar" aria-hidden="true"><i class="${cls}" style="width:${Math.max(1.5, (Math.abs(v) / mx) * 100)}%"></i></span>`;
+  let h = `<section class="panel"><div class="panel-h"><h2>¿Por qué tendrás eso?</h2><span class="sub">al ${esc(fmtDate(r.end))}</span></div>
+    <p class="lead-q" style="margin-top:0">Todo lo que entra y sale de tu efectivo y débito de hoy a esa fecha. Toca una línea para ver cada movimiento.</p>
+    <div class="wf">
+      <div class="wf-row total"><span class="wf-l"><span><b>Disponible hoy</b></span></span><span class="wf-v">${esc(m0(r.liquid0))}</span>${bar(r.liquid0, 'base')}</div>
+      ${rows.map((x) => `<button type="button" class="wf-row" data-act="sdLedger" data-c="${x.c}"><span class="wf-l"><span class="wf-ico" aria-hidden="true">${ico(LEDGER[x.c].icon)}</span><span><b>${esc(LEDGER[x.c].label)}</b><small>${x.n === 1 ? '1 movimiento' : x.n + ' movimientos'}</small></span></span><span class="wf-v ${x.amt > 0 ? 'in' : ''}">${esc(m0(x.amt, true))}</span>${bar(x.amt, x.amt > 0 ? 'up' : 'down')}</button>`).join('')}
+      ${r.liqInterest > 0.5 ? `<div class="wf-row"><span class="wf-l"><span class="wf-ico" aria-hidden="true">${IC.trendUp}</span><span><b>Rendimientos</b><small>De tus cuentas con rendimiento</small></span></span><span class="wf-v in">${esc(m0(r.liqInterest, true))}</span>${bar(r.liqInterest, 'up')}</div>` : ''}
+      <div class="wf-row total end"><span class="wf-l"><span><b>Disponible el ${esc(fmtDate(r.end, 'day'))}</b></span></span><span class="wf-v ${r.liquid1 < 0 ? 'out' : ''}">${esc(m0(r.liquid1))}</span>${bar(r.liquid1, r.liquid1 < 0 ? 'down' : 'base')}</div>
+    </div>`;
+  const notes = [];
+  if (r.offCard > 0.5) notes.push(`${esc(m0(r.offCard))} en compras con tarjeta: salen de tu disponible hasta que pagas la tarjeta`);
+  if (r.offVouchers > 0.5) notes.push(`${esc(m0(r.offVouchers))} en gastos con vales de despensa: se descuentan de tus vales`);
+  if (notes.length) h += insight(`No te descuentan directo: ${notes.join('; ')}.`, 'info');
+  // lo que más te descuenta, agrupado por nombre
+  const g = {};
+  for (const x of r.ledger) {
+    if (x.amt >= 0) continue; const k = x.cls + '|' + x.name;
+    const o = (g[k] = g[k] || { x, total: 0, n: 0 }); o.total += -x.amt; o.n++;
+  }
+  const top = Object.values(g).sort((a, b) => b.total - a.total).slice(0, 6); const outTot = sum(Object.values(g), (o) => o.total);
+  if (top.length) {
+    h += `<div class="label mt">Lo que más te descuenta</div><div class="list">${top.map((o) => `<div class="item" style="min-height:52px"><span class="ico sm" style="${o.x.cat && findCat(o.x.cat) ? tint(catColor(o.x.cat)) : ''}" aria-hidden="true">${ledgerIcon(o.x)}</span><span class="item-main"><span class="item-title">${esc(o.x.name)}</span><span class="item-sub">${o.n === 1 ? '1 vez' : o.n + ' veces'}, ${Math.round((o.total / Math.max(1, outTot)) * 100)}% de lo que sale</span></span><span class="amt">−${esc(m0(o.total))}</span></div>`).join('')}</div>`;
+  }
+  h += `<button type="button" class="btn outline block mt" data-act="sdLedger" data-c="all">${IC.list} Ver cada movimiento (${r.ledger.length})</button></section>`;
+  return h;
+}
+/** Hoja con cada movimiento que cambia tu disponible, agrupado por día */
+function openLedgerSheet(filter = 'all') {
+  let f = filter;
+  const sh = openSheet({ title: 'Movimiento por movimiento', tall: true });
+  sh.setFoot('');
+  const draw = () => {
+    const r = simulateTo(UI.sd.date, simBase());
+    const present = Object.keys(LEDGER).filter((c) => r.ledger.some((x) => x.cls === c));
+    const list = f === 'all' ? r.ledger : r.ledger.filter((x) => x.cls === f);
+    const tot = sum(list, (x) => x.amt);
+    let h = `<div class="chips scroll mb" role="group" aria-label="Filtrar">${[['all', 'Todo'], ...present.map((c) => [c, LEDGER[c].label.split(' ')[0] === 'Gastos' ? 'Gastos' : LEDGER[c].label.replace('Pagos de ', '').replace('Ahorro para tus metas', 'Ahorro').replace('Transferencias entre cuentas', 'Transferencias')])].map(([v, l]) => `<button type="button" class="chip sm" data-f="${v}" aria-pressed="${f === v}">${esc(l.charAt(0).toUpperCase() + l.slice(1))}</button>`).join('')}</div>`;
+    h += f === 'all' ? `<div class="kv" style="padding-top:0"><span>Empiezas con</span><span>${esc(money(r.liquid0, { decimals: 0 }))}</span></div><div class="kv"><span>Terminas el ${esc(fmtDate(r.end, 'day'))} con</span><span class="strong">${esc(money(r.liquid1, { decimals: 0 }))}</span></div>`
+      : `<div class="kv" style="padding-top:0"><span>${list.length === 1 ? '1 movimiento' : list.length + ' movimientos'}</span><span class="${tot > 0 ? 'in' : ''}">${esc(money(tot, { decimals: 0, sign: true }))}</span></div>`;
+    if (!list.length) h += `<div class="empty"><p>No hay movimientos de este tipo.</p></div>`;
+    const MAX = 500; let cur = null, buf = '', dayTot = 0, dayBal = 0;
+    const flush = () => { if (cur) h += `<div class="day-h"><span>${esc(relDay(cur))}</span><span>${f === 'all' ? 'Queda ' + esc(money(dayBal, { decimals: 0 })) : esc(money(dayTot, { decimals: 0, sign: true }))}</span></div><div class="list">${buf}</div>`; };
+    for (const x of list.slice(0, MAX)) {
+      if (x.d !== cur) { flush(); cur = x.d; buf = ''; dayTot = 0; }
+      dayTot += x.amt; dayBal = x.bal;
+      const sub = [accName(x.acc)]; if (x.extra) sub.push('simulado'); if (x.goals && x.goals.length) sub.push(listJoin(x.goals));
+      buf += `<div class="item" style="min-height:52px"><span class="ico sm" style="${x.cat && findCat(x.cat) ? tint(catColor(x.cat)) : ''}" aria-hidden="true">${ledgerIcon(x)}</span><span class="item-main"><span class="item-title">${esc(ledgerName(x))}</span><span class="item-sub">${esc(sub.join(', '))}</span></span><span class="amt ${x.amt > 0 ? 'in' : ''}">${esc(money(x.amt, { sign: true }))}</span></div>`;
+    }
+    flush();
+    if (list.length > MAX) h += `<p class="muted small mt">Se muestran los primeros ${MAX}. Elige una fecha más cercana para ver el resto.</p>`;
+    if (f === 'all' && r.liqInterest > 0.5) h += `<p class="muted small mt">Además, tus cuentas generan ${esc(money(r.liqInterest))} de rendimientos en ese lapso.</p>`;
+    sh.setBody(h);
+  };
+  draw();
+  sh.body.addEventListener('click', (e) => { const b = e.target.closest('[data-f]'); if (b) { f = b.dataset.f; draw(); sh.body.scrollTop = 0; } });
+}
+
 /* ---------- Deudas en el simulador ---------- */
 /** Opciones del simulador guardadas: regla de ahorro, extras, deudas y forma de pago de cada tarjeta */
 function simBase() {
   const t = D.today();
-  return { applySavings: UI.sd.savings, extras: S.sim.extras.filter((x) => x.date >= t), debts: activeSimDebts(), cardPlan: S.sim.cardPlan };
+  return { applySavings: UI.sd.savings, extras: S.sim.extras.filter((x) => x.date >= t), debts: activeSimDebts(), cardPlan: S.sim.cardPlan, split: S.sim.split };
 }
 const cardPlanOf = (id) => S.sim.cardPlan[id] || 'due';
 function planChips(act, id, cur, withNone) {
   return `<div class="chips plan-chips" role="group" aria-label="¿Cuándo pagas?">${Object.entries(CONFIG.debtPlans).filter(([k]) => withNone || k !== 'none')
     .map(([k, p]) => `<button type="button" class="chip sm" data-act="${act}" data-id="${id}" data-v="${k}" aria-pressed="${cur === k}">${esc(p.chip)}</button>`).join('')}</div>`;
 }
-/** Texto y montos de cómo queda el pago de una deuda (o de un corte de tarjeta) */
-function planLine(plan, pays, due, amount, paydays) {
+/** Texto y montos de cómo queda el pago de una deuda (o de un corte de tarjeta).
+ *  key identifica sus montos elegidos por cobro en S.sim.split; from = desde cuándo se puede pagar. */
+function planLine(plan, pays, due, amount, paydays, key, from = D.today()) {
   const t = D.today();
   if (plan === 'none') return `<p class="plan-note">No se paga en la simulación: la deuda sigue y en una tarjeta genera intereses.</p>`;
   if (!(amount > 0.004)) return `<p class="plan-note">No hay saldo por pagar.</p>`;
   if (!pays.length) return `<p class="plan-note">Sin pagos dentro de la simulación.</p>`;
-  const inWin = paydays.filter((d) => d >= t && d <= due).length;
+  const inWin = paydays.filter((d) => d >= from && d <= due).length;
+  const custom = plan === 'split' && S.sim.split[key] && Object.keys(S.sim.split[key]).length;
   let lead;
   if (due < t) lead = 'Ya venció: se paga en cuanto se pueda.';
-  else if (plan === 'split') lead = pays.length > 1 ? `En ${pays.length} pagos, uno por cobro:` : inWin ? 'Antes de la fecha límite solo cae un cobro:' : 'No cobras antes de la fecha límite; se paga ese día:';
+  else if (plan === 'split') lead = pays.length > 1 ? (custom ? `En ${pays.length} pagos, con los montos que elegiste:` : `En ${pays.length} pagos iguales, uno por cobro:`) : inWin ? 'Antes de la fecha límite solo cae un cobro:' : 'No cobras antes de la fecha límite; se paga ese día:';
   else if (plan === 'asap') lead = pays[0].d === due && !paydays.includes(due) ? 'No cobras antes de la fecha límite; se paga ese día:' : 'Todo con tu próximo cobro:';
   else lead = 'Todo el último día:';
-  return `<p class="plan-note">${esc(lead)}</p><div class="pay-pills">${pays.map((p) => `<span class="pay-pill"><span>${esc(fmtDate(p.d))}</span><b>${esc(money(p.amt, { decimals: p.amt % 1 ? 2 : 0 }))}</b></span>`).join('')}</div>`;
+  const edit = plan === 'split' && inWin >= 2 && due >= t
+    ? `<button type="button" class="btn sm ghost plan-edit" data-act="sdSplitEdit" data-k="${esc(key)}">${IC.edit} ${custom ? 'Cambiar los montos' : 'Elegir cuánto pagar en cada cobro'}</button>` : '';
+  return `<p class="plan-note">${esc(lead)}</p><div class="pay-pills">${pays.map((p) => `<span class="pay-pill"><span>${esc(fmtDate(p.d))}</span><b>${esc(money(p.amt, { decimals: p.amt % 1 ? 2 : 0 }))}</b></span>`).join('')}</div>${edit}`;
 }
 function debtsPanel(base) {
   const t = D.today(); const cards = activeAccounts().filter((a) => a.type === 'credit'); const all = S.sim.debts;
@@ -3284,13 +3420,13 @@ function debtsPanel(base) {
     h += `<div class="debt-item"><div class="debt-head"><span class="ico sm" aria-hidden="true">${IC.card}</span><span class="item-main"><span class="item-title">${esc(a.name)}</span><span class="item-sub">Tarjeta de crédito, debes ${esc(money(c.debt, { decimals: 0 }))}</span></span></div>
       ${planChips('sdCardPlan', a.id, plan, true)}
       ${groups.map((g) => `<div class="debt-cycle"><div class="kv"><span>${esc(g.title)}</span><span>${esc(money(g.amount, { decimals: 0 }))}</span></div><div class="muted tiny">Fecha límite: ${esc(g.due < t ? 'venció el ' + fmtDate(g.due, 'long') : fmtDate(g.due, 'long'))}</div>
-        ${planLine(plan, cur.pays.filter((p) => p.ref === a.id && p.due === g.due), g.due, g.amount, cur.paydays)}</div>`).join('')}
+        ${planLine(plan, cur.pays.filter((p) => p.ref === a.id && p.due === g.due), g.due, g.amount, cur.paydays, `card:${a.id}:${g.due}`, g.est ? c.nextCut : t)}</div>`).join('')}
     </div>`;
   }
   for (const x of all) {
     const gone = !(D.valid(x.due) && x.due >= t);
     h += `<div class="debt-item ${gone ? 'dim' : ''}"><div class="debt-head"><span class="ico sm" aria-hidden="true">${ico('receipt')}</span><button type="button" class="item-main debt-edit" data-act="sdEditDebt" data-id="${x.id}"><span class="item-title">${esc(x.name)}</span><span class="item-sub">${esc(money(x.amount, { decimals: 0 }))}, ${gone ? 'venció el ' : 'límite '}${esc(fmtDate(x.due, 'day'))}${x.accountId && findAcc(x.accountId) ? ', de ' + esc(findAcc(x.accountId).name) : ''}</span></button><button type="button" class="icon-btn" data-act="sdDelDebt" data-id="${x.id}" aria-label="Quitar ${esc(x.name)}">${IC.close}</button></div>
-      ${gone ? '<p class="plan-note">Su fecha límite ya pasó; no entra en la simulación.</p>' : planChips('sdDebtPlan', x.id, x.plan || 'split', false) + planLine(x.plan || 'split', cur.pays.filter((p) => p.ref === x.id), x.due, +x.amount, cur.paydays)}
+      ${gone ? '<p class="plan-note">Su fecha límite ya pasó; no entra en la simulación.</p>' : planChips('sdDebtPlan', x.id, x.plan || 'split', false) + planLine(x.plan || 'split', cur.pays.filter((p) => p.ref === x.id), x.due, +x.amount, cur.paydays, 'debt:' + x.id)}
     </div>`;
   }
   if (!cards.length && !all.length) h += `<p class="muted small">Aún no tienes tarjetas ni deudas en la simulación.</p>`;
@@ -4058,12 +4194,58 @@ function openDebtForm(debt = null) {
     if (!(amount > 0)) return toast('Escribe cuánto debes.', 'error');
     if (!D.valid(v.due) || v.due < t) return toast('Elige una fecha límite de hoy en adelante.', 'error');
     const data = { name: (v.name || '').trim() || 'Deuda', amount, due: v.due, accountId: v.accountId || null, plan };
+    if (debt && (debt.due !== data.due)) delete S.sim.split['debt:' + debt.id];   // cambian los cobros: los montos elegidos ya no aplican
     if (debt) Object.assign(debt, data); else S.sim.debts.push(Object.assign({ id: uid(), created: t }, data));
     if (D.valid(UI.sd.date) && UI.sd.date < v.due) UI.sd.date = v.due;   // que la simulación llegue a la fecha límite
     save(); sh.close(); render(); toast(debt ? 'Deuda actualizada.' : 'Deuda agregada a la simulación.', 'ok');
   };
   const del = $('[data-del]', sh.el);
-  if (del) del.onclick = () => { S.sim.debts = S.sim.debts.filter((y) => y.id !== debt.id); save(); sh.close(); render(); };
+  if (del) del.onclick = () => { S.sim.debts = S.sim.debts.filter((y) => y.id !== debt.id); delete S.sim.split['debt:' + debt.id]; save(); sh.close(); render(); };
+}
+/** ¿Qué se está dividiendo? key = 'debt:id' o 'card:id:fechaLímite' */
+function splitTarget(key) {
+  const t = D.today(); const [kind, id, due] = String(key).split(':');
+  if (kind === 'debt') { const x = S.sim.debts.find((y) => y.id === id); return x ? { name: x.name, total: +x.amount, due: x.due, from: t, est: false } : null; }
+  const a = findAcc(id); if (!a) return null; const c = cardInfo(a);
+  const pend = c.pendingLast > 0 && due === c.dueLast;
+  return { name: a.name, total: pend ? c.pendingLast : c.nextStatement, due, from: pend ? t : c.nextCut, est: !pend };
+}
+/** Elegir cuánto cubrir de una deuda en cada cobro (forma de pago "Dividir") */
+function openSplitEditor(key) {
+  const tg = splitTarget(key); if (!tg) return;
+  const t = D.today(); const dates = planDates('split', tg.from, tg.due, paydayDates(t, tg.due));
+  if (dates.length < 2) return toast('Antes de la fecha límite solo cae un cobro.', 'error');
+  const saved = S.sim.split[key] || {};
+  const sh = openSheet({ title: 'Cuánto pagar en cada cobro', tall: true, foot: `<button type="button" class="btn ghost" data-reset>Repartir igual</button><button type="button" class="btn" data-save>Guardar</button>` });
+  const last = dates.length - 1;
+  sh.setBody(`<p style="margin:0 0 .25rem"><b>${esc(tg.name)}</b>: ${tg.est ? 'unos ' : ''}<span class="num">${esc(money(tg.total))}</span> antes del ${esc(fmtDate(tg.due, 'long'))}.</p>
+    <p class="muted small" style="margin-top:0">Escribe cuánto quieres cubrir en cada cobro. Los que dejes vacíos se reparten por igual lo que falte, y el último cobro paga el resto para que quede saldada a tiempo.${tg.est ? ' Como el monto del corte es aproximado, el último cobro se ajusta a lo que salga.' : ''}</p>
+    <div class="split-list">${dates.map((d, i) => i < last
+    ? `<label class="split-row"><span class="sr-l"><b>Cobro del ${esc(fmtDate(d, 'day'))}</b><small>${i === 0 ? 'Primer pago' : `Pago ${i + 1} de ${dates.length}`}</small></span>${moneyInput('p' + i, saved[d], { attrs: `data-d="${d}" aria-label="Monto para el cobro del ${esc(fmtDate(d, 'long'))}"` })}</label>`
+    : `<div class="split-row"><span class="sr-l"><b>Cobro del ${esc(fmtDate(d, 'day'))}</b><small>Último pago: el resto</small></span><span class="sr-rest" data-rest></span></div>`).join('')}</div>
+    <div class="split-sum" data-sum role="status"></div>`);
+  const read = () => { const c = {}; let bad = false; $$('[data-d]', sh.body).forEach((el) => { const v = el.value.trim(); if (v === '') return; const n = parseAmount(v); if (isNaN(n) || n < 0) bad = true; else c[el.dataset.d] = n; }); return { c, bad }; };
+  const upd = () => {
+    const { c, bad } = read(); const parts = splitParts(tg.total, dates, c);
+    $$('[data-d]', sh.body).forEach((el, i) => { el.placeholder = amountField(parts[i]); });
+    $('[data-rest]', sh.body).textContent = money(parts[last]);
+    const fixed = round2(sum(Object.values(c))); const over = round2(fixed - tg.total); const box = $('[data-sum]', sh.body);
+    if (bad) { box.className = 'split-sum bad'; box.textContent = 'Revisa los montos: escribe solo números.'; }
+    else if (over > 0.004) { box.className = 'split-sum bad'; box.textContent = `Te pasas por ${money(over)}: lo que escribiste suma ${money(fixed)} y debes ${money(tg.total)}.`; }
+    else if (!Object.keys(c).length) { box.className = 'split-sum'; box.textContent = `Sin montos elegidos: se reparte igual, unos ${money(parts[0])} por cobro.`; }
+    else { box.className = 'split-sum'; box.textContent = `Elegiste ${money(fixed)}. Falta cubrir ${money(round2(tg.total - fixed))}, que se reparte en los cobros vacíos y el último.`; }
+    return { c, bad, over };
+  };
+  upd();
+  sh.body.addEventListener('input', upd);
+  $('[data-reset]', sh.el).onclick = () => { $$('[data-d]', sh.body).forEach((el) => { el.value = ''; }); upd(); };
+  $('[data-save]', sh.el).onclick = () => {
+    const { c, bad, over } = upd();
+    if (bad) return toast('Revisa los montos.', 'error');
+    if (over > 0.004) return toast(`Te pasas por ${money(over)} de lo que debes.`, 'error');
+    if (Object.keys(c).length) S.sim.split[key] = c; else delete S.sim.split[key];
+    save(); sh.close(); render(); toast(Object.keys(c).length ? 'Montos guardados en la simulación.' : 'Se reparte por igual.', 'ok');
+  };
 }
 
 /* ---------- Secciones de Ajustes ---------- */
@@ -4358,7 +4540,9 @@ Object.assign(ACT, {
   sdDebtPlan: (d) => { const x = S.sim.debts.find((y) => y.id === d.id); if (x) { x.plan = d.v; save(); render(); } },
   sdNewDebt: () => openDebtForm(),
   sdEditDebt: (d) => { const x = S.sim.debts.find((y) => y.id === d.id); if (x) openDebtForm(x); },
-  sdDelDebt: (d) => { S.sim.debts = S.sim.debts.filter((y) => y.id !== d.id); save(); render(); },
+  sdDelDebt: (d) => { S.sim.debts = S.sim.debts.filter((y) => y.id !== d.id); delete S.sim.split['debt:' + d.id]; save(); render(); },
+  sdSplitEdit: (d) => openSplitEditor(d.k),
+  sdLedger: (d) => openLedgerSheet(d.c || 'all'),
   sdKind: (d) => { UI.sdKind = d.v; $$('[data-act="sdKind"]').forEach((b) => b.setAttribute('aria-pressed', b.dataset.v === d.v)); },
   sdAddExtra: () => {
     const amt = parseAmount(($('#sd-x-amt') || {}).value); const date = ($('#sd-x-date') || {}).value;
